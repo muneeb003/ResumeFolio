@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/Resume Projects/**)",
+      "Read(//d/Manzil/manzil-residence/**)",
+      "Bash(npx create-next-app@latest \"Resume to Portfolio\" --typescript --tailwind --eslint --app --import-alias \"@/*\" --no-git --yes)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --import-alias \"@/*\" --no-git --yes)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --import-alias \"@/*\" --no-git --yes --name resume-to-portfolio)",
+      "Bash(node -e \":*)",
+      "Bash(npm install:*)",
+      "Bash(node -e \"console.log\\(require\\(''./node_modules/next/package.json''\\).version\\)\")",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(cp middleware.ts proxy.ts)",
+      "Bash(rm middleware.ts)",
+      "Read(//c/Users/dell/.claude/projects/d--Resume-Projects-Resume-to-Portfolio/memory 2>/dev/null && cat C:Usersdell.claudeprojectsd--Resume-Projects-Resume-to-PortfoliomemoryMEMORY.md 2>/dev/**)",
+      "Read(//c/Users/dell/.claude/projects/d--Resume-Projects-Resume-to-Portfolio/memory/**)",
+      "Bash(npm uninstall:*)"
+    ],
+    "additionalDirectories": [
+      "d:\\Resume Projects\\Resume to Portfolio\\app\\portfolio\\[id]",
+      "d:\\Resume Projects\\Resume to Portfolio\\app\\p"
+    ]
+  }
+}
