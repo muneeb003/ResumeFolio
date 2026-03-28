@@ -1,5 +1,7 @@
 import { NextAuthOptions } from 'next-auth'
 import GitHubProvider from 'next-auth/providers/github'
+import GoogleProvider from 'next-auth/providers/google'
+import EmailProvider from 'next-auth/providers/email'
 import PostgresAdapter from '@auth/pg-adapter'
 import { Pool } from 'pg'
 
@@ -26,6 +28,22 @@ export const authOptions: NextAuthOptions = {
         },
       },
     }),
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? [
+          GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          }),
+        ]
+      : []),
+    ...(process.env.EMAIL_SERVER && process.env.EMAIL_FROM
+      ? [
+          EmailProvider({
+            server: process.env.EMAIL_SERVER,
+            from: process.env.EMAIL_FROM,
+          }),
+        ]
+      : []),
   ],
   adapter: PostgresAdapter(getPool()) as NextAuthOptions['adapter'],
   session: {
@@ -35,6 +53,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, account, profile }) {
       if (account) {
         token.accessToken = account.access_token
+        token.provider = account.provider
       }
       if (profile && 'login' in profile) {
         token.githubLogin = (profile as { login: string }).login
@@ -52,6 +71,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/auth/signin',
+    verifyRequest: '/auth/verify-request',
   },
 }
 

@@ -83,24 +83,27 @@ export default function DesignPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full" />
+      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
+        <div className="animate-spin w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full" />
       </div>
     )
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-zinc-50">
       <div className="max-w-7xl mx-auto px-4 py-10">
         <StepIndicator currentStep={3} />
 
-        <h1 className="text-3xl font-bold text-gray-900 text-center mb-10">Choose Your Design</h1>
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-zinc-900 tracking-tight mb-1">Choose your design</h1>
+          <p className="text-sm text-zinc-500">Pick a template and customize the colors and sections.</p>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
           {/* Controls sidebar */}
-          <div className="flex flex-col gap-5">
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
-              <h2 className="text-sm font-semibold text-gray-700">Template</h2>
+          <div className="flex flex-col gap-4">
+            <div className="bg-white rounded-xl border border-zinc-200 p-4 flex flex-col gap-2">
+              <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-1 mb-1">Template</h2>
               {TEMPLATES.map((t) => (
                 <TemplateCard
                   key={t.id}
@@ -113,8 +116,8 @@ export default function DesignPage() {
               ))}
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
-              <h2 className="text-sm font-semibold text-gray-700">Accent Color</h2>
+            <div className="bg-white rounded-xl border border-zinc-200 p-4 flex flex-col gap-3">
+              <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Accent Color</h2>
               <ColorPicker
                 swatches={TEMPLATE_COLORS[templateId]}
                 value={accentColor}
@@ -122,8 +125,8 @@ export default function DesignPage() {
               />
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
-              <h2 className="text-sm font-semibold text-gray-700">Sections</h2>
+            <div className="bg-white rounded-xl border border-zinc-200 p-4 flex flex-col gap-2.5">
+              <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">Sections</h2>
               {sectionOrder.map((id) => (
                 <Toggle
                   key={id}
@@ -136,7 +139,7 @@ export default function DesignPage() {
 
             <div className="flex flex-col gap-2">
               <Button size="lg" onClick={handleContinue} className="w-full">
-                Deploy This Design →
+                Deploy this design →
               </Button>
               <Button variant="secondary" onClick={() => router.push('/create/review')} className="w-full">
                 ← Back to Edit
@@ -146,12 +149,12 @@ export default function DesignPage() {
 
           {/* Live preview */}
           <div className="flex flex-col gap-2">
-            <p className="text-xs text-gray-400 text-center">Live preview (scaled)</p>
+            <p className="text-xs text-zinc-400">Live preview (scaled)</p>
             {previewHtml ? (
               <TemplatePreview html={previewHtml} />
             ) : (
-              <div className="bg-gray-100 rounded-xl aspect-video flex items-center justify-center">
-                <div className="animate-spin w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full" />
+              <div className="bg-zinc-100 rounded-xl aspect-video flex items-center justify-center">
+                <div className="animate-spin w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full" />
               </div>
             )}
           </div>
