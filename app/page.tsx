@@ -11,7 +11,7 @@ export default async function LandingPage() {
     <div className="min-h-screen bg-white">
       {/* Nav */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-zinc-100">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <span className="text-sm font-bold tracking-tight text-zinc-900">ResumeFolio</span>
           <nav className="flex items-center gap-1">
             {session ? (
@@ -33,14 +33,14 @@ export default async function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 pt-20 pb-24 grid grid-cols-1 lg:grid-cols-[1fr_440px] gap-16 items-center">
+      <section className="max-w-6xl mx-auto px-5 sm:px-6 pt-16 sm:pt-20 pb-20 sm:pb-24 grid grid-cols-1 lg:grid-cols-[1fr_440px] gap-12 lg:gap-16 items-center">
         <div>
           <div className="inline-flex items-center gap-2 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
             Free · No credit card · No API keys needed
           </div>
 
-          <h1 className="text-[3.5rem] sm:text-[4.5rem] font-bold tracking-[-0.04em] text-zinc-900 leading-[1.05] mb-6 text-balance">
+          <h1 className="text-4xl sm:text-5xl lg:text-[4rem] xl:text-[4.5rem] font-bold tracking-[-0.03em] text-zinc-900 leading-[1.08] mb-6 text-balance">
             Your resume,<br />
             <span className="text-indigo-600">turned portfolio.</span>
           </h1>
@@ -164,9 +164,9 @@ export default async function LandingPage() {
       </section>
 
       {/* How it works */}
-      <section className="bg-zinc-50 border-y border-zinc-100 py-24">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-col lg:flex-row gap-20 items-start">
+      <section className="bg-zinc-50 border-y border-zinc-100 py-16 sm:py-24">
+        <div className="max-w-6xl mx-auto px-5 sm:px-6">
+          <div className="flex flex-col lg:flex-row gap-10 lg:gap-20 items-start">
             <div className="lg:sticky lg:top-24 shrink-0 lg:w-56">
               <p className="text-[11px] font-bold tracking-widest text-indigo-600 uppercase mb-3">Process</p>
               <h2 className="text-3xl font-bold text-zinc-900 leading-tight tracking-tight">
@@ -213,17 +213,17 @@ export default async function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="py-24">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-16">
+      <section className="py-16 sm:py-24">
+        <div className="max-w-6xl mx-auto px-5 sm:px-6">
+          <div className="mb-12 sm:mb-16">
             <p className="text-[11px] font-bold tracking-widest text-indigo-600 uppercase mb-3">Features</p>
-            <h2 className="text-3xl font-bold text-zinc-900 tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">
               Everything included. Nothing extra.
             </h2>
           </div>
 
-          {/* Grid with dividers */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 divide-zinc-100 border border-zinc-100 rounded-xl overflow-hidden">
+          {/* Responsive feature grid — simple border approach */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-zinc-200 border border-zinc-200 rounded-xl overflow-hidden">
             {[
               {
                 icon: (
@@ -279,15 +279,8 @@ export default async function LandingPage() {
                 title: 'Instant Hosting',
                 desc: 'Live on a shareable ResumeFolio URL in seconds. No GitHub, no setup, no waiting.',
               },
-            ].map((f, i) => (
-              <div
-                key={f.title}
-                className={`p-8 bg-white hover:bg-zinc-50/80 transition-colors duration-150 ${
-                  i < 3 ? 'md:border-b border-zinc-100' : ''
-                } ${i % 3 !== 2 ? 'lg:border-r border-zinc-100' : ''} ${
-                  i % 2 === 0 ? 'md:border-r lg:border-r-0' : 'md:border-r-0'
-                } ${i % 2 === 0 && i % 3 !== 2 ? 'lg:border-r border-zinc-100' : ''}`}
-              >
+            ].map((f) => (
+              <div key={f.title} className="p-6 sm:p-8 bg-white hover:bg-zinc-50/80 transition-colors duration-150">
                 <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 mb-4">
                   {f.icon}
                 </div>
@@ -299,12 +292,115 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* Templates Gallery */}
+      <section className="py-16 sm:py-24">
+        <div className="max-w-6xl mx-auto px-5 sm:px-6">
+          <div className="mb-10 sm:mb-14">
+            <p className="text-[11px] font-bold tracking-widest text-indigo-600 uppercase mb-3">Templates</p>
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight mb-2">
+                  14 designs. One for every career.
+                </h2>
+                <p className="text-sm text-zinc-500 max-w-md">
+                  Every template is fully self-contained HTML — no dependencies, loads instantly, Lighthouse 95+.
+                </p>
+              </div>
+              <Link href={ctaHref} className="shrink-0">
+                <Button variant="secondary" size="sm">Try them free →</Button>
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            {([
+              { id: 'developer',  name: 'Developer',  desc: 'VS Code–inspired editor with file tree and syntax highlighting', bg: '#0d1117', accent: '#6366f1', dark: true,  sidebar: true },
+              { id: 'minimal',    name: 'Minimal',    desc: 'Clean white background with subtle accents. Timeless.', bg: '#ffffff', accent: '#6366f1', dark: false, sidebar: false },
+              { id: 'dark-dev',   name: 'Dark Dev',   desc: 'Dark theme with monospace fonts. Loved by developers.', bg: '#0f172a', accent: '#10b981', dark: true,  sidebar: false },
+              { id: 'bold',       name: 'Bold',       desc: 'Gradient header with strong typography. Stand out.', bg: '#4f46e5', accent: '#a5b4fc', dark: true,  sidebar: false },
+              { id: 'glass',      name: 'Glass',      desc: 'Frosted glass cards on an animated dark gradient.', bg: '#0f0c29', accent: '#06b6d4', dark: true,  sidebar: false },
+              { id: 'neon',       name: 'Neon',       desc: 'Cyberpunk dark theme with glowing neon accents.', bg: '#060609', accent: '#00ff88', dark: true,  sidebar: false },
+              { id: 'editorial',  name: 'Editorial',  desc: 'Swiss two-column grid. Pure typography, perfect whitespace.', bg: '#ffffff', accent: '#374151', dark: false, sidebar: true },
+              { id: 'magazine',   name: 'Magazine',   desc: 'Cormorant Garamond editorial with hairline rules.', bg: '#fafafa', accent: '#0a0a0a', dark: false, sidebar: false },
+              { id: 'corporate',  name: 'Corporate',  desc: 'Sidebar nav, animated skill bars, and a timeline.', bg: '#f8fafc', accent: '#1e40af', dark: false, sidebar: true },
+              { id: 'designer',   name: 'Designer',   desc: 'Asymmetric layout with oversized typography.', bg: '#f9fafb', accent: '#f97316', dark: false, sidebar: false },
+              { id: 'cinematic',  name: 'Cinematic',  desc: 'Full-screen sections with horizontal project scroll.', bg: '#09090b', accent: '#8b5cf6', dark: true,  sidebar: false },
+              { id: 'student',    name: 'Student',    desc: 'Gradient hero, emoji icons, and a friendly layout.', bg: '#4f46e5', accent: '#c7d2fe', dark: true,  sidebar: false },
+              { id: 'freelancer', name: 'Freelancer', desc: 'Split-screen hero, services grid, and a strong CTA.', bg: '#0f172a', accent: '#f59e0b', dark: true,  sidebar: true },
+              { id: 'brutalist',  name: 'Brutalist',  desc: 'Neo-brutalist: cream bg, hard shadows, zero radius.', bg: '#f5f0e8', accent: '#000000', dark: false, sidebar: false },
+            ] as const).map((t) => (
+              <div
+                key={t.id}
+                className="group rounded-xl overflow-hidden border border-zinc-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-200/80 hover:-translate-y-0.5 transition-all duration-200"
+              >
+                {/* CSS mini-preview */}
+                <div className="h-[108px] relative overflow-hidden" style={{ background: t.bg }}>
+                  {/* Nav */}
+                  <div
+                    className="h-5 flex items-center px-2.5 gap-2"
+                    style={{
+                      background: t.dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                      borderBottom: t.dark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(0,0,0,0.06)',
+                    }}
+                  >
+                    <div className="h-1.5 rounded-full w-10" style={{ background: t.dark ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.18)' }} />
+                    <div className="flex-1" />
+                    {[18, 14, 18].map((w, i) => (
+                      <div key={i} className="h-1 rounded-full" style={{ width: w, background: t.dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' }} />
+                    ))}
+                  </div>
+
+                  {/* Body */}
+                  {t.sidebar ? (
+                    <div className="flex h-[calc(100%-20px)]">
+                      {/* Sidebar */}
+                      <div
+                        className="w-[30%] flex flex-col gap-1.5 px-2 pt-2.5"
+                        style={{ background: t.dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', borderRight: t.dark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.05)' }}
+                      >
+                        <div className="h-1.5 rounded-sm w-full" style={{ background: t.accent + (t.dark ? 'cc' : '99') }} />
+                        {[0.5, 0.35, 0.45].map((o, i) => (
+                          <div key={i} className="h-1 rounded-sm" style={{ width: `${70 + i * 8}%`, background: t.dark ? `rgba(255,255,255,${o * 0.5})` : `rgba(0,0,0,${o * 0.35})` }} />
+                        ))}
+                      </div>
+                      {/* Content */}
+                      <div className="flex-1 px-2.5 pt-2.5 flex flex-col gap-1.5">
+                        <div className="h-2.5 rounded-sm w-4/5" style={{ background: t.accent + (t.dark ? 'bb' : '88') }} />
+                        {[1, 0.8, 0.6, 0.5].map((o, i) => (
+                          <div key={i} className="h-1 rounded-sm" style={{ width: `${85 - i * 10}%`, background: t.dark ? `rgba(255,255,255,${o * 0.18})` : `rgba(0,0,0,${o * 0.12})` }} />
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="px-3 pt-3 flex flex-col gap-1.5">
+                      <div className="h-3 rounded-sm w-3/4" style={{ background: t.accent + (t.dark ? 'dd' : 'aa') }} />
+                      {[1, 0.75, 0.55].map((o, i) => (
+                        <div key={i} className="h-1.5 rounded-sm" style={{ width: `${90 - i * 12}%`, background: t.dark ? `rgba(255,255,255,${o * 0.16})` : `rgba(0,0,0,${o * 0.1})` }} />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Bottom accent strip */}
+                  <div className="absolute bottom-0 inset-x-0 h-[3px]" style={{ background: t.accent }} />
+                </div>
+
+                {/* Card footer */}
+                <div className="px-3 py-2.5 bg-white border-t border-zinc-100">
+                  <p className="text-xs font-semibold text-zinc-900 leading-none mb-1">{t.name}</p>
+                  <p className="text-[11px] text-zinc-400 leading-snug line-clamp-2">{t.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
-      <section className="bg-zinc-950 py-28">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="bg-zinc-950 py-20 sm:py-28">
+        <div className="max-w-6xl mx-auto px-5 sm:px-6">
           <div className="max-w-xl">
             <p className="text-[11px] font-bold tracking-widest text-indigo-400 uppercase mb-4">Get started</p>
-            <h2 className="text-4xl font-bold text-white leading-tight tracking-tight mb-5 text-balance">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight tracking-tight mb-5 text-balance">
               Your portfolio is one upload away.
             </h2>
             <p className="text-zinc-400 mb-10 leading-relaxed">
@@ -326,7 +422,7 @@ export default async function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-zinc-100 py-8">
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between flex-wrap gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between flex-wrap gap-4">
           <span className="text-sm font-bold tracking-tight text-zinc-900">ResumeFolio</span>
           <p className="text-xs text-zinc-400">Built with Next.js, Tailwind CSS, and Google Gemini.</p>
         </div>

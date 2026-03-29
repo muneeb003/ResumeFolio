@@ -8,7 +8,7 @@ const STEPS = [
 export function StepIndicator({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
   return (
     <nav className="flex items-center justify-center mb-10" aria-label="Progress">
-      <div className="flex items-center gap-1 bg-zinc-100 rounded-full p-1">
+      <div className="flex items-center gap-0.5 bg-zinc-100 rounded-full p-1">
         {STEPS.map((step) => {
           const done = step.num < currentStep
           const active = step.num === currentStep
@@ -16,7 +16,7 @@ export function StepIndicator({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
           return (
             <div
               key={step.num}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                 active
                   ? 'bg-white text-zinc-900 shadow-sm'
                   : done
@@ -43,7 +43,9 @@ export function StepIndicator({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
                   {step.num}
                 </span>
               )}
-              <span>{step.label}</span>
+              {/* Show label always on sm+, only for active/done on mobile */}
+              <span className="hidden sm:inline">{step.label}</span>
+              <span className="sm:hidden">{(active || done) ? step.label : ''}</span>
             </div>
           )
         })}

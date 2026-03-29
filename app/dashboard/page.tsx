@@ -35,7 +35,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-zinc-50">
       {/* Header */}
       <header className="bg-white border-b border-zinc-200 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <a href="/" className="text-sm font-bold tracking-tight text-zinc-900">
             ResumeFolio
           </a>
@@ -53,7 +53,7 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-12">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Page heading */}
         <div className="mb-10">
           <h1 className="text-2xl font-bold text-zinc-900 tracking-tight mb-1">

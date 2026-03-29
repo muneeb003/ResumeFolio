@@ -292,26 +292,34 @@ export default function DeployPage() {
         {step === 'idle' && (
           <div className="bg-white rounded-xl border border-zinc-200 p-6 flex flex-col gap-5">
             {/* Mode selector */}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {MODE_OPTIONS.map((opt) => (
                 <button
                   key={opt.id}
                   onClick={() => setMode(opt.id)}
-                  className={`flex flex-col items-start gap-2 p-3.5 rounded-xl border-2 text-left transition-all duration-150 ${
+                  className={`flex sm:flex-col items-center sm:items-start gap-3 sm:gap-2 p-3 sm:p-3.5 rounded-xl border-2 text-left transition-all duration-150 ${
                     mode === opt.id
                       ? 'border-indigo-500 bg-indigo-50/60'
                       : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
                   }`}
                 >
-                  <span className={`${mode === opt.id ? 'text-indigo-600' : 'text-zinc-500'} transition-colors`}>
+                  <span className={`shrink-0 ${mode === opt.id ? 'text-indigo-600' : 'text-zinc-500'} transition-colors`}>
                     {opt.icon}
                   </span>
                   <div>
-                    <p className={`text-xs font-semibold leading-none mb-1 ${mode === opt.id ? 'text-indigo-700' : 'text-zinc-800'}`}>
+                    <p className={`text-xs font-semibold leading-none mb-0.5 sm:mb-1 ${mode === opt.id ? 'text-indigo-700' : 'text-zinc-800'}`}>
                       {opt.label}
                     </p>
                     <p className="text-[11px] text-zinc-400 leading-tight">{opt.desc}</p>
                   </div>
+                  {/* Mobile selection indicator */}
+                  {mode === opt.id && (
+                    <div className="ml-auto sm:hidden w-4 h-4 bg-indigo-600 rounded-full flex items-center justify-center shrink-0">
+                      <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
                 </button>
               ))}
             </div>

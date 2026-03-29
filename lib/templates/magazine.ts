@@ -191,6 +191,8 @@ a{cursor:pointer}
   .skills-grid{grid-template-columns:1fr !important}
   .edu-grid{grid-template-columns:1fr !important}
   .stats-grid{grid-template-columns:1fr !important}
+  .mag-nav-links{display:none !important}
+  .mag-nav-vol{display:none !important}
 }
 </style>
 </head>
@@ -201,7 +203,7 @@ a{cursor:pointer}
   <div>
     <a href="#" style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;font-style:italic;color:#0a0a0a;text-decoration:none">${esc(data.name)}</a>
   </div>
-  <div style="display:flex;align-items:center;gap:0">
+  <div class="mag-nav-links" style="display:flex;align-items:center;gap:0">
     ${sectionOrder
       .filter((id) => !hiddenSections.includes(id))
       .map(
@@ -210,7 +212,7 @@ a{cursor:pointer}
       )
       .join('')}
   </div>
-  <div style="text-align:right">
+  <div class="mag-nav-vol" style="text-align:right">
     <span style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#757575">VOL. 1</span>
   </div>
 </nav>
