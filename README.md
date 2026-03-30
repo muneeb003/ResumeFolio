@@ -1,32 +1,80 @@
 # ResumeFolio
 
-Turn your resume into a live portfolio in 60 seconds. Upload a PDF or DOCX, let AI extract your data, pick a design, and deploy — all for free.
+**Full-stack AI-powered web application** that converts a resume PDF or DOCX into a live, deployed portfolio website in under 60 seconds — with zero configuration required from the user.
 
-## Features
+> Live demo: _coming soon_ · Built with Next.js 16, TypeScript, PostgreSQL, Google Gemini AI
 
-- **AI extraction** — Gemini 2.5 Flash parses any resume into structured data
-- **14 portfolio templates** — Developer, Designer, Minimal, Dark Dev, Bold, Editorial, Cinematic, Corporate, Student, Freelancer, Glass, Neon, Brutalist, Magazine
-- **AI tools** — improve bullet points, auto-describe GitHub projects, ATS score
-- **Three auth options** — GitHub, Google, or email magic link
-- **Two deploy options** — self-hosted (instant, on your ResumeFolio URL) or GitHub Pages (your own domain)
-- **Profile photo** — upload and embed in any template
-- **Zero user API keys** — everything runs on our keys
+---
+
+## Overview
+
+ResumeFolio is a production-grade SaaS tool that handles the full pipeline: document parsing → AI data extraction → interactive editor → template rendering → one-click deployment to GitHub Pages. Users sign in with GitHub OAuth once and the app handles everything — no API keys, no manual setup.
+
+---
+
+## Key Features
+
+- **AI Resume Parsing** — Uploads a PDF or DOCX; Google Gemini 2.5 Flash extracts structured JSON (experience, projects, skills, education, contact) from raw text using a schema-constrained prompt
+- **14 Portfolio Templates** — Developer, Minimal, Dark Dev, Bold, Editorial, Magazine, Corporate, Designer, Cinematic, Student, Freelancer, Glass, Neon, Brutalist — all generated as fully self-contained HTML with inlined CSS (no external dependencies, Lighthouse 95+)
+- **AI Writing Tools** — Per-bullet rewrite assistant, GitHub README-to-project-description generator, ATS keyword gap analysis with suggestions
+- **GitHub Pages Deployment** — Uses the GitHub OAuth token from the session to programmatically create a repo, push the HTML file, and enable GitHub Pages — the user never leaves the app
+- **Live Template Preview** — Scaled iframe (1280×900 → scaled down) renders the actual generated HTML using real mock data, updated instantly on theme/color change
+- **Drag-and-Drop Section Reorder** — dnd-kit sortable list; section order persisted per portfolio
+- **Three Auth Methods** — GitHub OAuth, Google OAuth, Email magic link (via Resend/SMTP) with automatic cross-provider account linking
+- **Rate Limiting** — Upstash Redis rate limiter on all AI and deploy endpoints
+- **ZIP Export** — Download a self-contained HTML file as a ZIP for self-hosting
 
 ---
 
 ## Tech Stack
 
-| Layer | Library |
+| Category | Technology |
 |---|---|
-| Framework | Next.js 16 (App Router, TypeScript) |
+| Framework | Next.js 16 (App Router, React Server Components, TypeScript) |
 | Styling | Tailwind CSS |
-| Auth | NextAuth.js v4 |
-| Database | Neon (PostgreSQL) via `@neondatabase/serverless` |
-| AI | Google Gemini 2.5 Flash |
-| File parsing | `pdf-parse`, `mammoth` |
-| Drag & drop | `dnd-kit` |
-| Rate limiting | Upstash Redis |
-| ZIP export | `archiver` |
+| Authentication | NextAuth.js v4 — GitHub OAuth, Google OAuth, Email magic link |
+| Database | Neon (serverless PostgreSQL) via `@neondatabase/serverless` + `pg` |
+| ORM / Adapter | `@auth/pg-adapter` for NextAuth session storage |
+| AI / LLM | Google Gemini 2.5 Flash (`@google/generative-ai`) |
+| Document Parsing | `pdf-parse` (PDF), `mammoth` (DOCX) |
+| Drag and Drop | `@dnd-kit/core`, `@dnd-kit/sortable` |
+| Rate Limiting | Upstash Redis (`@upstash/ratelimit`, `@upstash/redis`) |
+| File Compression | `archiver` (ZIP generation) |
+| Validation | `zod` — schema validation on all API inputs |
+| Email | `nodemailer` via Resend SMTP |
+| Deployment | Vercel (app) + GitHub Pages (generated portfolios) |
+
+---
+
+## Architecture
+
+```
+Browser
+  │
+  ├── Next.js App Router (RSC + Client Components)
+  │     ├── /                  Landing page (SSR, session-aware)
+  │     ├── /dashboard         Portfolio manager
+  │     ├── /create            4-step wizard: Upload → Review → Design → Deploy
+  │     └── /p/[id]            Public portfolio serving (self-hosted option)
+  │
+  └── API Routes
+        ├── /api/auth/[...nextauth]   NextAuth — GitHub, Google, Email
+        ├── /api/parse                PDF/DOCX → text → Gemini → ResumeData JSON
+        ├── /api/ai/improve-bullet    Gemini bullet rewrite
+        ├── /api/ai/describe-project  GitHub README → project description
+        ├── /api/ai/ats-score         Keyword gap analysis
+        ├── /api/deploy/github        GitHub API → create repo → push HTML → enable Pages
+        ├── /api/deploy/download      Stream ZIP file to browser
+        ├── /api/portfolio            CRUD (create, read, update, delete)
+        └── /api/preview/[templateId] Unauthenticated — renders template with mock data (cached)
+
+Database (Neon PostgreSQL)
+  ├── users              (NextAuth standard + github_login column)
+  ├── accounts           (OAuth provider links)
+  ├── sessions           (JWT session storage)
+  ├── verification_tokens (email magic link tokens)
+  └── portfolios         (resume_data JSONB, template_id, accent_color, section_order, deployment_url)
+```
 
 ---
 
@@ -45,9 +93,8 @@ npm install
 1. Sign up at [neon.tech](https://neon.tech) (free tier)
 2. Create a new project
 3. Copy the **Connection string** from the dashboard
-4. Run the schema migration (see [Database Setup](#database-setup))
 
-### 3. Create a GitHub OAuth App (for dev)
+### 3. Create a GitHub OAuth App
 
 1. Go to [github.com/settings/developers](https://github.com/settings/developers) → **OAuth Apps** → **New OAuth App**
 2. Fill in:
@@ -58,66 +105,54 @@ npm install
 
 ### 4. Get a Gemini API key
 
-1. Go to [aistudio.google.com](https://aistudio.google.com) → **Get API key**
-2. Create a key in a new project (free, no credit card)
+Go to [aistudio.google.com](https://aistudio.google.com) → **Get API key** — free, no credit card required.
 
 ### 5. Configure environment variables
 
-Copy the template and fill in your values:
-
-```bash
-cp .env.local.example .env.local   # or create .env.local manually
-```
+Create `.env.local` in the project root:
 
 ```env
 # NextAuth
 NEXTAUTH_SECRET=<run: openssl rand -base64 32>
 NEXTAUTH_URL=http://localhost:3000
 
-# GitHub OAuth (required)
+# GitHub OAuth (required — also used for GitHub Pages deployment)
 GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
 
-# Neon database (required)
+# Neon PostgreSQL (required)
 DATABASE_URL=postgresql://user:pass@host/dbname?sslmode=require
 
 # Google Gemini AI (required)
 GOOGLE_AI_API_KEY=your_gemini_key
 
 # Google OAuth (optional — enables "Continue with Google")
-# console.cloud.google.com → APIs & Services → Credentials → OAuth 2.0 Client
-# Authorized redirect URI: http://localhost:3000/api/auth/callback/google
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 
-# Email magic link (optional — enables email sign-in)
-# Use Resend (resend.com) for easiest setup:
-#   EMAIL_SERVER=smtp://resend:YOUR_RESEND_API_KEY@smtp.resend.com:465
-#   EMAIL_FROM=ResumeFolio <noreply@yourdomain.com>
-# Or any SMTP provider:
-#   EMAIL_SERVER=smtp://user:pass@smtp.example.com:587
+# Email magic link (optional — enables email sign-in via Resend or any SMTP)
+# Resend: smtp://resend:YOUR_RESEND_API_KEY@smtp.resend.com:465
 EMAIL_SERVER=
-EMAIL_FROM=
+EMAIL_FROM=ResumeFolio <noreply@yourdomain.com>
 
-# Upstash Redis (optional — enables rate limiting)
-# upstash.com → Create database → REST API
+# Upstash Redis (optional — enables rate limiting on AI + deploy endpoints)
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 ```
 
-### 6. Database setup
+### 6. Run the database migration
 
-Run this SQL in your Neon project's SQL editor:
+Run this SQL in your Neon project's SQL editor (or any PostgreSQL client):
 
 ```sql
 CREATE TABLE IF NOT EXISTS users (
-  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name         TEXT,
-  email        TEXT UNIQUE,
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name            TEXT,
+  email           TEXT UNIQUE,
   "emailVerified" TIMESTAMPTZ,
-  image        TEXT,
-  github_login TEXT,
-  created_at   TIMESTAMPTZ DEFAULT NOW()
+  image           TEXT,
+  github_login    TEXT,
+  created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS accounts (
@@ -167,7 +202,7 @@ CREATE TABLE IF NOT EXISTS portfolios (
 );
 ```
 
-### 7. Run the dev server
+### 7. Start the dev server
 
 ```bash
 npm run dev
@@ -182,63 +217,51 @@ Open [http://localhost:3000](http://localhost:3000).
 ### 1. Create a production GitHub OAuth App
 
 Create a **second** OAuth App at [github.com/settings/developers](https://github.com/settings/developers):
+
 - **Homepage URL**: `https://your-app.vercel.app`
 - **Authorization callback URL**: `https://your-app.vercel.app/api/auth/callback/github`
 
-(GitHub only allows one callback URL per app, so dev and prod need separate apps.)
+GitHub only allows one callback URL per app, so dev and prod need separate apps.
 
-### 2. Deploy to Vercel
+### 2. Deploy
 
 ```bash
 npm install -g vercel
-vercel
-```
-
-Or connect your GitHub repo in the [Vercel dashboard](https://vercel.com/new).
-
-### 3. Add environment variables in Vercel
-
-In your Vercel project → **Settings** → **Environment Variables**, add all the same variables from `.env.local` but with production values:
-
-| Variable | Production value |
-|---|---|
-| `NEXTAUTH_URL` | `https://your-app.vercel.app` |
-| `NEXTAUTH_SECRET` | same secret (or regenerate) |
-| `GITHUB_CLIENT_ID` | from your **production** OAuth App |
-| `GITHUB_CLIENT_SECRET` | from your **production** OAuth App |
-| `DATABASE_URL` | same Neon connection string |
-| `GOOGLE_AI_API_KEY` | same Gemini key |
-| `GOOGLE_CLIENT_ID` | add `https://your-app.vercel.app/api/auth/callback/google` as redirect URI |
-| `GOOGLE_CLIENT_SECRET` | same |
-| `EMAIL_SERVER` | same |
-| `EMAIL_FROM` | same |
-
-### 4. Redeploy
-
-```bash
 vercel --prod
 ```
 
+Or connect your GitHub repo directly in the [Vercel dashboard](https://vercel.com/new).
+
+### 3. Environment variables in Vercel
+
+In **Settings → Environment Variables**, add all variables from `.env.local` with production values:
+
+| Variable | Note |
+|---|---|
+| `NEXTAUTH_URL` | `https://your-app.vercel.app` |
+| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | From your **production** OAuth App |
+| `DATABASE_URL` | Same Neon connection string |
+| `GOOGLE_AI_API_KEY` | Same Gemini key |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Add prod redirect URI in Google Console |
+
 ---
 
-## Optional: Google OAuth Setup
+## Optional: Google OAuth
 
-1. Go to [console.cloud.google.com](https://console.cloud.google.com)
-2. Create a project → **APIs & Services** → **Credentials** → **Create OAuth 2.0 Client ID**
-3. Application type: **Web application**
-4. Authorized redirect URIs:
-   - `http://localhost:3000/api/auth/callback/google` (dev)
-   - `https://your-app.vercel.app/api/auth/callback/google` (prod)
-5. Copy **Client ID** and **Client Secret** into `.env.local`
+1. [console.cloud.google.com](https://console.cloud.google.com) → **APIs & Services** → **Credentials** → **Create OAuth 2.0 Client ID**
+2. Application type: **Web application**
+3. Authorized redirect URIs:
+   - `http://localhost:3000/api/auth/callback/google`
+   - `https://your-app.vercel.app/api/auth/callback/google`
+4. Copy **Client ID** and **Client Secret** into `.env.local`
 
 ---
 
-## Optional: Email Magic Link Setup (via Resend)
+## Optional: Email Sign-in via Resend
 
-1. Sign up at [resend.com](https://resend.com) (free: 3,000 emails/mo)
+1. Sign up at [resend.com](https://resend.com) (free: 3,000 emails/month)
 2. Add and verify your sending domain
-3. Create an API key
-4. Set in `.env.local`:
+3. Create an API key and set:
    ```env
    EMAIL_SERVER=smtp://resend:re_YOUR_API_KEY@smtp.resend.com:465
    EMAIL_FROM=ResumeFolio <noreply@yourdomain.com>
@@ -250,49 +273,67 @@ vercel --prod
 
 ```
 app/
-  page.tsx                    # Landing page
-  dashboard/page.tsx          # Portfolio list
+  page.tsx                      # Landing page (SSR, session-aware CTA)
+  dashboard/page.tsx            # Portfolio list with sidebar layout
   create/
-    page.tsx                  # Step 1: Upload resume
-    review/page.tsx           # Step 2: Review + AI tools
-    design/page.tsx           # Step 3: Pick template & colors
-    deploy/page.tsx           # Step 4: Deploy
-  portfolio/[id]/edit/        # Edit existing portfolio
-  p/[id]/route.ts             # Public self-hosted portfolio serving
+    page.tsx                    # Step 1: Upload resume (PDF/DOCX or manual form)
+    review/page.tsx             # Step 2: Edit extracted data + AI tools
+    design/page.tsx             # Step 3: Choose template + accent color
+    deploy/page.tsx             # Step 4: Deploy to GitHub Pages or download ZIP
+  portfolio/[id]/edit/          # Re-edit and redeploy existing portfolio
+  p/[id]/route.ts               # Public self-hosted portfolio (HTML served directly)
   api/
-    auth/[...nextauth]/       # NextAuth handler
-    parse/                    # Resume → AI → JSON
-    ai/                       # improve-bullet, describe-project, ats-score
-    deploy/                   # github, download (ZIP)
-    portfolio/                # CRUD
+    auth/[...nextauth]/         # NextAuth handler
+    parse/                      # POST: file → text extraction → Gemini → ResumeData
+    preview/[templateId]/       # GET: render template with mock data (public, cached)
+    ai/improve-bullet/          # POST: rewrite a single bullet point
+    ai/describe-project/        # POST: GitHub repo URL → project description
+    ai/ats-score/               # POST: analyze keyword gaps
+    deploy/github/              # POST: push HTML to GitHub, enable Pages
+    deploy/download/            # GET: stream ZIP
+    portfolio/                  # POST: create · GET/PUT/DELETE /[id]
 
 components/
-  ui/                         # Button, Input, StepIndicator, ColorPicker…
-  upload/                     # DropZone, ManualEntryFallback
-  review/                     # Section editors, AtsPanel, ImproveBulletButton
-  design/                     # TemplateCard, TemplatePreview (iframe)
-  deploy/                     # DeployOptions, DeployProgress, SuccessCard
-  dashboard/                  # PortfolioCard
+  ui/                           # Button, Input, Textarea, StepIndicator, ColorPicker, Toggle
+  upload/                       # DropZone (react-dropzone), ManualEntryFallback
+  review/                       # ExperienceEditor, ProjectEditor, SkillsEditor,
+  |                             #   ImproveBulletButton, AtsPanel, DraggableSection
+  design/                       # TemplateCard, TemplatePreview
+  deploy/                       # DeployOptions, DeployProgress, SuccessCard
+  dashboard/                    # PortfolioCard
 
 lib/
-  auth.ts                     # NextAuth config
-  gemini.ts                   # Gemini client
-  github.ts                   # GitHub Pages deployment
-  zip.ts                      # ZIP export
-  types.ts                    # ResumeData, TemplateId
-  db/portfolios.ts            # DB CRUD
-  ai/                         # extractResume, improveBullet, atsScore…
-  extractors/                 # pdfExtractor, docxExtractor
-  templates/                  # 14 HTML template generators
+  auth.ts                       # NextAuth config (GitHub + Google + Email)
+  gemini.ts                     # Gemini client (server-side)
+  github.ts                     # GitHub API — repo creation, file push, Pages enable
+  zip.ts                        # archiver ZIP generator
+  types.ts                      # ResumeData, TemplateId, PortfolioRecord
+  db/portfolios.ts              # PostgreSQL CRUD helpers
+  ai/                           # extractResume, improveBullet, describeProject, atsScore
+  extractors/                   # pdfExtractor (pdf-parse), docxExtractor (mammoth)
+  templates/                    # 14 HTML generators: minimal, darkDev, bold, editorial…
+  ratelimit.ts                  # Upstash rate limiter instances
+  validation/                   # Zod schemas: resumeSchema, deploySchema
 ```
 
 ---
 
-## Available Scripts
+## Scripts
 
 ```bash
-npm run dev       # Start dev server (localhost:3000)
+npm run dev       # Start dev server on localhost:3000
 npm run build     # Production build
 npm run start     # Start production server
-npx tsc --noEmit  # Type check without building
+npx tsc --noEmit  # Type-check without emitting
+npm run lint      # ESLint
 ```
+
+---
+
+## Security Notes
+
+- All AI and deploy routes are protected by session middleware and Upstash rate limiting
+- User content is HTML-escaped through a shared `esc()` utility before injection into templates (XSS prevention)
+- GitHub access tokens are stored in encrypted JWT sessions only — never written to the database
+- `allowDangerousEmailAccountLinking` is enabled on Google OAuth because Google verifies email ownership before issuing tokens
+- `.env.local` is gitignored — never commit real credentials

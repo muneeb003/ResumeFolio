@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/Button'
-import { UserMenu } from '@/components/auth/UserMenu'
 import { PortfolioCard } from '@/components/dashboard/PortfolioCard'
 import { clearAll } from '@/lib/storage'
 import type { PortfolioRecord } from '@/lib/types'
@@ -29,78 +28,152 @@ export default function DashboardPage() {
     clearAll()
   }
 
-  const firstName = session?.user?.name?.split(' ')[0]
+  const name = session?.user?.name ?? ''
+  const firstName = name.split(' ')[0] || 'You'
+  const initials = name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase() || '?'
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      {/* Header */}
-      <header className="bg-white border-b border-zinc-200 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <a href="/" className="text-sm font-bold tracking-tight text-zinc-900">
-            ResumeFolio
+    <div className="min-h-screen bg-zinc-50 flex">
+
+      {/* ── Sidebar (lg+) ──────────────────────────────────── */}
+      <aside className="hidden lg:flex flex-col w-56 xl:w-60 shrink-0 bg-white border-r border-zinc-200 h-screen sticky top-0 overflow-y-auto">
+        {/* Logo */}
+        <div className="px-5 pt-5 pb-4 border-b border-zinc-100">
+          <a href="/" className="text-sm font-bold tracking-tight text-zinc-900">ResumeFolio</a>
+        </div>
+
+        {/* User */}
+        <div className="px-5 py-4 border-b border-zinc-100">
+          {session?.user?.image ? (
+            <img
+              src={session.user.image}
+              alt=""
+              className="w-8 h-8 rounded-full mb-3"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mb-3">
+              <span className="text-xs font-bold text-indigo-600">{initials}</span>
+            </div>
+          )}
+          <p className="text-sm font-semibold text-zinc-900 truncate leading-none mb-0.5">
+            {session?.user?.name ?? 'User'}
+          </p>
+          {session?.user?.email && (
+            <p className="text-xs text-zinc-400 truncate">{session.user.email}</p>
+          )}
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 px-3 pt-4">
+          <a
+            href="/create"
+            onClick={handleCreateNew}
+            className="flex items-center gap-2.5 w-full px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 rounded-lg transition-colors mb-3"
+          >
+            <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            New portfolio
           </a>
+
+          <div className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-zinc-700 bg-zinc-100 rounded-lg">
+            <svg className="w-3.5 h-3.5 text-zinc-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            Portfolios
+            {!loading && (
+              <span className="ml-auto text-xs text-zinc-400 tabular-nums">{portfolios.length}</span>
+            )}
+          </div>
+        </nav>
+
+        {/* Sign out */}
+        <div className="px-5 py-4 border-t border-zinc-100">
+          <button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="text-xs text-zinc-400 hover:text-zinc-600 transition-colors"
+          >
+            Sign out
+          </button>
+        </div>
+      </aside>
+
+      {/* ── Main ───────────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col min-w-0">
+
+        {/* Mobile header */}
+        <header className="lg:hidden bg-white border-b border-zinc-200 px-4 h-14 flex items-center justify-between sticky top-0 z-10">
+          <a href="/" className="text-sm font-bold tracking-tight text-zinc-900">ResumeFolio</a>
           <div className="flex items-center gap-2">
             <a href="/create" onClick={handleCreateNew}>
               <Button size="sm">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
-                New portfolio
+                New
               </Button>
             </a>
-            <UserMenu />
+            {session?.user?.image ? (
+              <img
+                src={session.user.image}
+                alt=""
+                className="w-7 h-7 rounded-full border border-zinc-200"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center">
+                <span className="text-[10px] font-bold text-indigo-600">{initials}</span>
+              </div>
+            )}
           </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        {/* Page heading */}
-        <div className="mb-10">
-          <h1 className="text-2xl font-bold text-zinc-900 tracking-tight mb-1">
-            {firstName ? `Welcome back, ${firstName}` : 'My Portfolios'}
-          </h1>
-          <p className="text-sm text-zinc-500">Manage and update your live portfolio websites.</p>
-        </div>
-
-        {loading ? (
-          <div className="flex justify-center py-28">
-            <div className="animate-spin w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full" />
-          </div>
-        ) : portfolios.length === 0 ? (
-          /* Empty state */
-          <div className="bg-white border border-zinc-200 rounded-xl p-16 text-center">
-            <div className="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center mx-auto mb-5">
-              <svg
-                className="w-6 h-6 text-zinc-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-              </svg>
-            </div>
-            <h2 className="text-base font-semibold text-zinc-900 mb-1">No portfolios yet</h2>
-            <p className="text-sm text-zinc-500 mb-7 max-w-xs mx-auto leading-relaxed">
-              Upload your resume to create your first live portfolio in under a minute.
+        {/* Content */}
+        <main className="flex-1 px-4 sm:px-8 py-8 sm:py-12 max-w-4xl w-full">
+          <div className="mb-8">
+            <h1 className="text-xl font-bold text-zinc-900 tracking-tight">
+              {firstName}&apos;s portfolios
+            </h1>
+            <p className="text-sm text-zinc-500 mt-1">
+              {loading
+                ? 'Loading…'
+                : portfolios.length === 0
+                ? 'Create your first portfolio below.'
+                : `${portfolios.length} portfolio${portfolios.length === 1 ? '' : 's'}`}
             </p>
-            <a href="/create" onClick={handleCreateNew}>
-              <Button>Create your portfolio →</Button>
-            </a>
           </div>
-        ) : (
-          /* Portfolio grid */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {portfolios.map((p) => (
-              <PortfolioCard key={p.id} portfolio={p} onDelete={handleDelete} />
-            ))}
 
-            {/* Add new card */}
-            <a href="/create" onClick={handleCreateNew} className="block">
-              <div className="h-full min-h-[180px] border-2 border-dashed border-zinc-200 rounded-xl flex flex-col items-center justify-center gap-3 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all duration-200 cursor-pointer group">
-                <div className="w-9 h-9 rounded-lg border-2 border-dashed border-zinc-300 group-hover:border-indigo-300 flex items-center justify-center transition-colors duration-200">
+          {loading ? (
+            <div className="flex items-center gap-3 py-12 text-zinc-400">
+              <div className="w-4 h-4 border-2 border-zinc-300 border-t-indigo-500 rounded-full animate-spin" />
+              <span className="text-sm">Loading portfolios…</span>
+            </div>
+          ) : portfolios.length === 0 ? (
+            <div className="py-20 text-center">
+              <p className="text-sm font-medium text-zinc-900 mb-2">Nothing here yet</p>
+              <p className="text-sm text-zinc-500 mb-8 max-w-xs mx-auto leading-relaxed">
+                Upload your resume and have a live portfolio in under a minute.
+              </p>
+              <a href="/create" onClick={handleCreateNew}>
+                <Button>Upload your resume →</Button>
+              </a>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {portfolios.map((p) => (
+                <PortfolioCard key={p.id} portfolio={p} onDelete={handleDelete} />
+              ))}
+
+              {/* Add new row */}
+              <a
+                href="/create"
+                onClick={handleCreateNew}
+                className="group flex items-center gap-3 p-4 border-2 border-dashed border-zinc-200 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/30 transition-all duration-200 mt-1"
+              >
+                <div className="w-7 h-7 rounded-lg border-2 border-dashed border-zinc-300 group-hover:border-indigo-400 flex items-center justify-center transition-colors shrink-0">
                   <svg
-                    className="w-4 h-4 text-zinc-400 group-hover:text-indigo-500 transition-colors duration-200"
+                    className="w-3.5 h-3.5 text-zinc-400 group-hover:text-indigo-500 transition-colors"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -109,14 +182,14 @@ export default function DashboardPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
                 </div>
-                <span className="text-xs font-medium text-zinc-400 group-hover:text-indigo-600 transition-colors duration-200">
+                <span className="text-sm font-medium text-zinc-400 group-hover:text-indigo-600 transition-colors">
                   New portfolio
                 </span>
-              </div>
-            </a>
-          </div>
-        )}
-      </main>
+              </a>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   )
 }
