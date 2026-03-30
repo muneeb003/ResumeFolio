@@ -1,5 +1,5 @@
 import type { ResumeData, SectionId } from '@/lib/types'
-import { esc, avatarHtml } from './shared'
+import { esc, avatarHtml, buildJsonLd, safeUrl, safeColor } from './shared'
 
 export function generateDesigner(
   data: ResumeData,
@@ -7,7 +7,7 @@ export function generateDesigner(
   sectionOrder: SectionId[],
   hiddenSections: SectionId[]
 ): string {
-  const a = esc(accent)
+  const a = safeColor(accent)
 
   const visibleSections = sectionOrder.filter((id) => !hiddenSections.includes(id))
 
@@ -79,8 +79,8 @@ export function generateDesigner(
               </div>
             </div>
             <div class="proj-footer">
-              ${p.liveUrl ? `<a href="${esc(p.liveUrl)}" target="_blank" class="proj-link proj-link--primary">View Live ↗</a>` : ''}
-              ${p.repoUrl ? `<a href="${esc(p.repoUrl)}" target="_blank" class="proj-link proj-link--ghost">Source ↗</a>` : ''}
+              ${p.liveUrl ? `<a href="${safeUrl(p.liveUrl)}" target="_blank" class="proj-link proj-link--primary">View Live ↗</a>` : ''}
+              ${p.repoUrl ? `<a href="${safeUrl(p.repoUrl)}" target="_blank" class="proj-link proj-link--ghost">Source ↗</a>` : ''}
             </div>
           </article>`
           )
@@ -135,8 +135,8 @@ export function generateDesigner(
         <p class="contact-tagline">Let&#039;s create something remarkable together.</p>
         <div class="contact-links">
           ${data.contact.email ? `<a href="mailto:${esc(data.contact.email)}" class="contact-cta">${esc(data.contact.email)}</a>` : ''}
-          ${data.contact.github ? `<a href="${esc(data.contact.github)}" target="_blank" class="contact-ghost">GitHub ↗</a>` : ''}
-          ${data.contact.linkedin ? `<a href="${esc(data.contact.linkedin)}" target="_blank" class="contact-ghost">LinkedIn ↗</a>` : ''}
+          ${data.contact.github ? `<a href="${safeUrl(data.contact.github)}" target="_blank" class="contact-ghost">GitHub ↗</a>` : ''}
+          ${data.contact.linkedin ? `<a href="${safeUrl(data.contact.linkedin)}" target="_blank" class="contact-ghost">LinkedIn ↗</a>` : ''}
         </div>
       </div>`
   }
@@ -192,7 +192,7 @@ export function generateDesigner(
 <meta property="og:type" content="profile">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"${esc(data.name)}","jobTitle":"${esc(data.title)}","description":"${esc(data.bio)}"${data.contact.email ? ',"email":"' + esc(data.contact.email) + '"' : ''}${data.contact.github ? ',"sameAs":"' + esc(data.contact.github) + '"' : ''}}</script>
+${buildJsonLd(data)}
 <style>
 /* ── Reset & Base ──────────────────────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0}

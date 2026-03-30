@@ -1,5 +1,5 @@
 import type { ResumeData, SectionId } from '@/lib/types'
-import { esc, renderSections, tags, avatarHtml } from './shared'
+import { esc, renderSections, tags, avatarHtml, buildJsonLd, safeUrl, safeColor } from './shared'
 
 export function generateDarkDev(
   data: ResumeData,
@@ -7,7 +7,7 @@ export function generateDarkDev(
   sectionOrder: SectionId[],
   hiddenSections: SectionId[]
 ): string {
-  const a = esc(accentColor)
+  const a = safeColor(accentColor)
 
   const renderers = {
     experience: (d: ResumeData) => !d.experience.length ? '' : `
@@ -35,8 +35,8 @@ export function generateDarkDev(
             <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;margin-bottom:8px">
               <h3 style="font-size:15px;font-weight:600;color:#e2e8f0;font-family:monospace">${esc(p.name)}</h3>
               <div style="display:flex;gap:8px">
-                ${p.liveUrl ? `<a href="${esc(p.liveUrl)}" target="_blank" style="font-size:12px;color:${a};text-decoration:none">↗ live</a>` : ''}
-                ${p.repoUrl ? `<a href="${esc(p.repoUrl)}" target="_blank" style="font-size:12px;color:#64748b;text-decoration:none">↗ repo</a>` : ''}
+                ${p.liveUrl ? `<a href="${safeUrl(p.liveUrl)}" target="_blank" style="font-size:12px;color:${a};text-decoration:none">↗ live</a>` : ''}
+                ${p.repoUrl ? `<a href="${safeUrl(p.repoUrl)}" target="_blank" style="font-size:12px;color:#64748b;text-decoration:none">↗ repo</a>` : ''}
               </div>
             </div>
             <p style="font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:10px">${esc(p.description)}</p>
@@ -72,8 +72,8 @@ export function generateDarkDev(
         <h2 style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:${a};margin-bottom:20px">> Contact</h2>
         <div style="display:flex;gap:20px;flex-wrap:wrap">
           ${d.contact.email ? `<a href="mailto:${esc(d.contact.email)}" style="font-size:14px;color:${a};text-decoration:none;font-family:monospace">${esc(d.contact.email)}</a>` : ''}
-          ${d.contact.github ? `<a href="${esc(d.contact.github)}" target="_blank" style="font-size:14px;color:${a};text-decoration:none">github ↗</a>` : ''}
-          ${d.contact.linkedin ? `<a href="${esc(d.contact.linkedin)}" target="_blank" style="font-size:14px;color:${a};text-decoration:none">linkedin ↗</a>` : ''}
+          ${d.contact.github ? `<a href="${safeUrl(d.contact.github)}" target="_blank" style="font-size:14px;color:${a};text-decoration:none">github ↗</a>` : ''}
+          ${d.contact.linkedin ? `<a href="${safeUrl(d.contact.linkedin)}" target="_blank" style="font-size:14px;color:${a};text-decoration:none">linkedin ↗</a>` : ''}
         </div>
       </section>`,
   }
@@ -91,7 +91,7 @@ export function generateDarkDev(
 <meta property="og:type" content="profile">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"${esc(data.name)}","jobTitle":"${esc(data.title)}"}</script>
+${buildJsonLd(data)}
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;color:#cbd5e1;background:#0f172a;line-height:1.6;-webkit-font-smoothing:antialiased}

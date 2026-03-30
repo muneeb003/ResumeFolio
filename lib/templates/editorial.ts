@@ -1,5 +1,5 @@
 import type { ResumeData, SectionId } from '@/lib/types'
-import { esc, renderSections, avatarHtml } from './shared'
+import { esc, renderSections, avatarHtml, buildJsonLd, safeUrl, safeColor } from './shared'
 
 export function generateEditorial(
   data: ResumeData,
@@ -7,7 +7,7 @@ export function generateEditorial(
   sectionOrder: SectionId[],
   hiddenSections: SectionId[]
 ): string {
-  const a = esc(accent)
+  const a = safeColor(accent)
 
   // Splits a full name into first + rest for the header display
   const nameParts = data.name.trim().split(/\s+/)
@@ -55,8 +55,8 @@ export function generateEditorial(
           <div class="proj-footer">
             ${p.tags.length ? `<span class="proj-tags">${p.tags.map(t => esc(t)).join(', ')}</span>` : ''}
             <span class="proj-links">
-              ${p.liveUrl ? `<a href="${esc(p.liveUrl)}" target="_blank" rel="noopener" class="proj-link accent-link" style="--a:${a}">Live ↗</a>` : ''}
-              ${p.repoUrl ? `<a href="${esc(p.repoUrl)}" target="_blank" rel="noopener" class="proj-link" style="--a:${a}">Repo ↗</a>` : ''}
+              ${p.liveUrl ? `<a href="${safeUrl(p.liveUrl)}" target="_blank" rel="noopener" class="proj-link accent-link" style="--a:${a}">Live ↗</a>` : ''}
+              ${p.repoUrl ? `<a href="${safeUrl(p.repoUrl)}" target="_blank" rel="noopener" class="proj-link" style="--a:${a}">Repo ↗</a>` : ''}
             </span>
           </div>
         </div>`
@@ -95,8 +95,8 @@ export function generateEditorial(
       'Contact',
       `<div class="contact-links">
         ${d.contact.email ? `<a href="mailto:${esc(d.contact.email)}" class="contact-link" style="--a:${a}">${esc(d.contact.email)}</a>` : ''}
-        ${d.contact.github ? `<a href="${esc(d.contact.github)}" target="_blank" rel="noopener" class="contact-link" style="--a:${a}">GitHub ↗</a>` : ''}
-        ${d.contact.linkedin ? `<a href="${esc(d.contact.linkedin)}" target="_blank" rel="noopener" class="contact-link" style="--a:${a}">LinkedIn ↗</a>` : ''}
+        ${d.contact.github ? `<a href="${safeUrl(d.contact.github)}" target="_blank" rel="noopener" class="contact-link" style="--a:${a}">GitHub ↗</a>` : ''}
+        ${d.contact.linkedin ? `<a href="${safeUrl(d.contact.linkedin)}" target="_blank" rel="noopener" class="contact-link" style="--a:${a}">LinkedIn ↗</a>` : ''}
       </div>`
     ),
   }
@@ -116,7 +116,7 @@ export function generateEditorial(
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"${esc(data.name)}","jobTitle":"${esc(data.title)}","description":"${esc(data.bio)}"${data.contact.email ? `,"email":"${esc(data.contact.email)}"` : ''}${data.contact.github ? `,"sameAs":"${esc(data.contact.github)}"` : ''}}</script>
+${buildJsonLd(data)}
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -506,8 +506,8 @@ a { color: inherit; text-decoration: none; }
     </div>
     <div class="header-right">
       ${data.contact.email ? `<a href="mailto:${esc(data.contact.email)}" class="header-contact-link">${esc(data.contact.email)}</a>` : ''}
-      ${data.contact.github ? `<a href="${esc(data.contact.github)}" target="_blank" rel="noopener" class="header-contact-link">GitHub ↗</a>` : ''}
-      ${data.contact.linkedin ? `<a href="${esc(data.contact.linkedin)}" target="_blank" rel="noopener" class="header-contact-link">LinkedIn ↗</a>` : ''}
+      ${data.contact.github ? `<a href="${safeUrl(data.contact.github)}" target="_blank" rel="noopener" class="header-contact-link">GitHub ↗</a>` : ''}
+      ${data.contact.linkedin ? `<a href="${safeUrl(data.contact.linkedin)}" target="_blank" rel="noopener" class="header-contact-link">LinkedIn ↗</a>` : ''}
     </div>
   </header>
 

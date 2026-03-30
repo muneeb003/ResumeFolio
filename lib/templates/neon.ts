@@ -1,5 +1,5 @@
 import type { ResumeData, SectionId } from '@/lib/types'
-import { esc, renderSections, avatarHtml } from './shared'
+import { esc, renderSections, avatarHtml, buildJsonLd, safeUrl, safeColor } from './shared'
 
 export function generateNeon(
   data: ResumeData,
@@ -7,7 +7,7 @@ export function generateNeon(
   sectionOrder: SectionId[],
   hiddenSections: SectionId[]
 ): string {
-  const a = esc(accent)
+  const a = safeColor(accent)
 
   // Build nav links from visible sections
   const navLinks = sectionOrder
@@ -72,8 +72,8 @@ export function generateNeon(
                 ${p.tags.map((t) => `<span style="display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;color:${a};padding:2px 8px;border:1px solid ${a}30;background:${a}08;border-radius:2px">[${esc(t)}]</span>`).join('')}
               </div>` : ''}
               <div style="display:flex;gap:10px;margin-top:4px">
-                ${p.liveUrl ? `<a href="${esc(p.liveUrl)}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:9px 14px;border:1px solid ${a};color:${a};border-radius:2px;font-size:13px;font-weight:700;text-decoration:none;font-family:'Share Tech Mono',monospace;transition:background 0.2s ease,color 0.2s ease,box-shadow 0.2s ease" onmouseover="this.style.background='${a}';this.style.color='#080810';this.style.boxShadow='0 0 16px ${a}60'" onmouseout="this.style.background='transparent';this.style.color='${a}';this.style.boxShadow='none'">LIVE ↗</a>` : ''}
-                ${p.repoUrl ? `<a href="${esc(p.repoUrl)}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:9px 14px;border:1px solid ${a}40;color:#c8c8d8;border-radius:2px;font-size:13px;font-weight:700;text-decoration:none;font-family:'Share Tech Mono',monospace;transition:border-color 0.2s ease,color 0.2s ease" onmouseover="this.style.borderColor='${a}';this.style.color='${a}'" onmouseout="this.style.borderColor='${a}40';this.style.color='#c8c8d8'">REPO ↗</a>` : ''}
+                ${p.liveUrl ? `<a href="${safeUrl(p.liveUrl)}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:9px 14px;border:1px solid ${a};color:${a};border-radius:2px;font-size:13px;font-weight:700;text-decoration:none;font-family:'Share Tech Mono',monospace;transition:background 0.2s ease,color 0.2s ease,box-shadow 0.2s ease" onmouseover="this.style.background='${a}';this.style.color='#080810';this.style.boxShadow='0 0 16px ${a}60'" onmouseout="this.style.background='transparent';this.style.color='${a}';this.style.boxShadow='none'">LIVE ↗</a>` : ''}
+                ${p.repoUrl ? `<a href="${safeUrl(p.repoUrl)}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:9px 14px;border:1px solid ${a}40;color:#c8c8d8;border-radius:2px;font-size:13px;font-weight:700;text-decoration:none;font-family:'Share Tech Mono',monospace;transition:border-color 0.2s ease,color 0.2s ease" onmouseover="this.style.borderColor='${a}';this.style.color='${a}'" onmouseout="this.style.borderColor='${a}40';this.style.color='#c8c8d8'">REPO ↗</a>` : ''}
               </div>
             </div>`).join('')}
           </div>
@@ -131,8 +131,8 @@ export function generateNeon(
             <p style="font-family:'Orbitron',monospace;font-size:clamp(22px,4vw,40px);font-weight:700;color:#ffffff;letter-spacing:0.04em;text-shadow:0 0 30px ${a}40;margin-bottom:8px">${esc(d.name)}</p>
             ${d.contact.email ? `<a href="mailto:${esc(d.contact.email)}" style="font-family:'Share Tech Mono',monospace;font-size:18px;color:${a};text-decoration:none;display:block;margin-bottom:36px;text-shadow:0 0 10px ${a}60">${esc(d.contact.email)}</a>` : ''}
             <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:14px">
-              ${d.contact.github ? `<a href="${esc(d.contact.github)}" target="_blank" rel="noopener" style="padding:12px 28px;border:1px solid ${a};color:${a};border-radius:2px;font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.08em;transition:background 0.2s ease,color 0.2s ease,box-shadow 0.2s ease" onmouseover="this.style.background='${a}';this.style.color='#080810';this.style.boxShadow='0 0 20px ${a}60'" onmouseout="this.style.background='transparent';this.style.color='${a}';this.style.boxShadow='none'">GITHUB ↗</a>` : ''}
-              ${d.contact.linkedin ? `<a href="${esc(d.contact.linkedin)}" target="_blank" rel="noopener" style="padding:12px 28px;border:1px solid ${a};color:${a};border-radius:2px;font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.08em;transition:background 0.2s ease,color 0.2s ease,box-shadow 0.2s ease" onmouseover="this.style.background='${a}';this.style.color='#080810';this.style.boxShadow='0 0 20px ${a}60'" onmouseout="this.style.background='transparent';this.style.color='${a}';this.style.boxShadow='none'">LINKEDIN ↗</a>` : ''}
+              ${d.contact.github ? `<a href="${safeUrl(d.contact.github)}" target="_blank" rel="noopener" style="padding:12px 28px;border:1px solid ${a};color:${a};border-radius:2px;font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.08em;transition:background 0.2s ease,color 0.2s ease,box-shadow 0.2s ease" onmouseover="this.style.background='${a}';this.style.color='#080810';this.style.boxShadow='0 0 20px ${a}60'" onmouseout="this.style.background='transparent';this.style.color='${a}';this.style.boxShadow='none'">GITHUB ↗</a>` : ''}
+              ${d.contact.linkedin ? `<a href="${safeUrl(d.contact.linkedin)}" target="_blank" rel="noopener" style="padding:12px 28px;border:1px solid ${a};color:${a};border-radius:2px;font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.08em;transition:background 0.2s ease,color 0.2s ease,box-shadow 0.2s ease" onmouseover="this.style.background='${a}';this.style.color='#080810';this.style.boxShadow='0 0 20px ${a}60'" onmouseout="this.style.background='transparent';this.style.color='${a}';this.style.boxShadow='none'">LINKEDIN ↗</a>` : ''}
             </div>
           </div>
         </div>
@@ -154,7 +154,7 @@ export function generateNeon(
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"${esc(data.name)}","jobTitle":"${esc(data.title)}","description":"${esc(data.bio)}"${data.contact.email ? `,"email":"${esc(data.contact.email)}"` : ''}${data.contact.github ? `,"sameAs":"${esc(data.contact.github)}"` : ''}}</script>
+${buildJsonLd(data)}
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -365,7 +365,7 @@ a { text-decoration: none; }
   <p class="hero-bio-neon fade-in" style="animation-delay:0.3s">${esc(data.bio)}</p>
   <div class="hero-ctas-neon fade-in" style="animation-delay:0.45s">
     ${data.contact.email ? `<a href="mailto:${esc(data.contact.email)}" class="cta-neon">CONTACT_ME</a>` : ''}
-    ${data.contact.github ? `<a href="${esc(data.contact.github)}" target="_blank" rel="noopener" class="cta-neon">VIEW_GITHUB ↗</a>` : ''}
+    ${data.contact.github ? `<a href="${safeUrl(data.contact.github)}" target="_blank" rel="noopener" class="cta-neon">VIEW_GITHUB ↗</a>` : ''}
   </div>
 </section>
 

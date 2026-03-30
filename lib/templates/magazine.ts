@@ -1,5 +1,5 @@
 import type { ResumeData, SectionId } from '@/lib/types'
-import { esc, renderSections, avatarHtml } from './shared'
+import { esc, renderSections, avatarHtml, buildJsonLd, safeUrl, safeColor } from './shared'
 
 export function generateMagazine(
   data: ResumeData,
@@ -7,7 +7,7 @@ export function generateMagazine(
   sectionOrder: SectionId[],
   hiddenSections: SectionId[]
 ): string {
-  const a = esc(accent)
+  const a = safeColor(accent)
 
   // Section counter — each rendered section gets an incrementing two-digit label
   let sectionCounter = 0
@@ -81,8 +81,8 @@ export function generateMagazine(
         <p style="font-family:'DM Sans',sans-serif;font-size:15px;color:#2d2d2d;line-height:1.75;margin-bottom:16px">${esc(p.description)}</p>
         ${p.tags.length ? `<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px">${p.tags.map((t) => `<span style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#757575">${esc(t)}</span>`).join('')}</div>` : ''}
         <div style="display:flex;gap:20px;flex-wrap:wrap">
-          ${p.liveUrl ? `<a href="${esc(p.liveUrl)}" target="_blank" rel="noopener" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:${a};text-decoration:underline;text-underline-offset:3px">Live Site ↗</a>` : ''}
-          ${p.repoUrl ? `<a href="${esc(p.repoUrl)}" target="_blank" rel="noopener" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#2d2d2d;text-decoration:underline;text-underline-offset:3px">Source Code ↗</a>` : ''}
+          ${p.liveUrl ? `<a href="${safeUrl(p.liveUrl)}" target="_blank" rel="noopener" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:${a};text-decoration:underline;text-underline-offset:3px">Live Site ↗</a>` : ''}
+          ${p.repoUrl ? `<a href="${safeUrl(p.repoUrl)}" target="_blank" rel="noopener" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#2d2d2d;text-decoration:underline;text-underline-offset:3px">Source Code ↗</a>` : ''}
         </div>
       </div>
     </div>`
@@ -144,8 +144,8 @@ export function generateMagazine(
     <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,6vw,72px);font-weight:300;font-style:italic;color:#0a0a0a;line-height:1.1;margin-bottom:48px">Let&#039;s create something<br>together.</h2>
     <div style="display:flex;flex-direction:column;gap:0;border-top:1px solid #e0e0e0;border-left:1px solid #e0e0e0;border-right:1px solid #e0e0e0">
       ${d.contact.email ? `<a href="mailto:${esc(d.contact.email)}" style="display:block;padding:20px 32px;border-bottom:1px solid #e0e0e0;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:#0a0a0a;text-decoration:none;text-align:left;transition:background 0.15s">${esc(d.contact.email)}</a>` : ''}
-      ${d.contact.github ? `<a href="${esc(d.contact.github)}" target="_blank" rel="noopener" style="display:block;padding:20px 32px;border-bottom:1px solid #e0e0e0;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:#0a0a0a;text-decoration:none;text-align:left">GitHub ↗</a>` : ''}
-      ${d.contact.linkedin ? `<a href="${esc(d.contact.linkedin)}" target="_blank" rel="noopener" style="display:block;padding:20px 32px;border-bottom:1px solid #e0e0e0;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:#0a0a0a;text-decoration:none;text-align:left">LinkedIn ↗</a>` : ''}
+      ${d.contact.github ? `<a href="${safeUrl(d.contact.github)}" target="_blank" rel="noopener" style="display:block;padding:20px 32px;border-bottom:1px solid #e0e0e0;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:#0a0a0a;text-decoration:none;text-align:left">GitHub ↗</a>` : ''}
+      ${d.contact.linkedin ? `<a href="${safeUrl(d.contact.linkedin)}" target="_blank" rel="noopener" style="display:block;padding:20px 32px;border-bottom:1px solid #e0e0e0;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:#0a0a0a;text-decoration:none;text-align:left">LinkedIn ↗</a>` : ''}
     </div>
   </div>
 </section>`
@@ -174,7 +174,7 @@ export function generateMagazine(
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"${esc(data.name)}","jobTitle":"${esc(data.title)}"}</script>
+${buildJsonLd(data)}
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:#fafafa;color:#2d2d2d;-webkit-font-smoothing:antialiased}
@@ -229,8 +229,8 @@ a{cursor:pointer}
       <p style="font-family:'DM Sans',sans-serif;font-size:15px;color:#2d2d2d;line-height:1.75;margin-bottom:24px">${esc(data.bio)}</p>
       <div style="display:flex;gap:16px;flex-wrap:wrap">
         ${data.contact.email ? `<a href="mailto:${esc(data.contact.email)}" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:${a};text-decoration:underline;text-underline-offset:3px">${esc(data.contact.email)}</a>` : ''}
-        ${data.contact.github ? `<a href="${esc(data.contact.github)}" target="_blank" rel="noopener" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#2d2d2d;text-decoration:underline;text-underline-offset:3px">GitHub ↗</a>` : ''}
-        ${data.contact.linkedin ? `<a href="${esc(data.contact.linkedin)}" target="_blank" rel="noopener" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#2d2d2d;text-decoration:underline;text-underline-offset:3px">LinkedIn ↗</a>` : ''}
+        ${data.contact.github ? `<a href="${safeUrl(data.contact.github)}" target="_blank" rel="noopener" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#2d2d2d;text-decoration:underline;text-underline-offset:3px">GitHub ↗</a>` : ''}
+        ${data.contact.linkedin ? `<a href="${safeUrl(data.contact.linkedin)}" target="_blank" rel="noopener" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#2d2d2d;text-decoration:underline;text-underline-offset:3px">LinkedIn ↗</a>` : ''}
       </div>
     </div>
   </div>

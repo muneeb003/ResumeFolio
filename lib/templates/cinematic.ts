@@ -1,5 +1,5 @@
 import type { ResumeData, SectionId } from '@/lib/types'
-import { esc, renderSections, avatarHtml } from './shared'
+import { esc, renderSections, avatarHtml, buildJsonLd, safeUrl, safeColor } from './shared'
 
 export function generateCinematic(
   data: ResumeData,
@@ -7,7 +7,7 @@ export function generateCinematic(
   sectionOrder: SectionId[],
   hiddenSections: SectionId[]
 ): string {
-  const a = esc(accent)
+  const a = safeColor(accent)
 
   const nameParts = data.name.trim().split(/\s+/)
   const firstName = esc(nameParts[0] ?? '')
@@ -84,8 +84,8 @@ export function generateCinematic(
                     ${p.tags.map(t => `<span class="proj-card-tag" style="color:${c.sub}">${esc(t)}</span>`).join('')}
                   </div>` : ''}
                   <div class="proj-card-links">
-                    ${p.liveUrl ? `<a href="${esc(p.liveUrl)}" target="_blank" rel="noopener" class="proj-card-link" style="background:${a};color:#fff">Live ↗</a>` : ''}
-                    ${p.repoUrl ? `<a href="${esc(p.repoUrl)}" target="_blank" rel="noopener" class="proj-card-link" style="background:${c.border};color:${c.muted}">Repo ↗</a>` : ''}
+                    ${p.liveUrl ? `<a href="${safeUrl(p.liveUrl)}" target="_blank" rel="noopener" class="proj-card-link" style="background:${a};color:#fff">Live ↗</a>` : ''}
+                    ${p.repoUrl ? `<a href="${safeUrl(p.repoUrl)}" target="_blank" rel="noopener" class="proj-card-link" style="background:${c.border};color:${c.muted}">Repo ↗</a>` : ''}
                   </div>
                 </div>
               </div>`
@@ -165,12 +165,12 @@ export function generateCinematic(
               <span class="contact-link-value">${esc(d.contact.email)}<span class="contact-accent-dot" style="color:${a}">.</span></span>
             </a>` : ''}
             ${d.contact.github ? `
-            <a href="${esc(d.contact.github)}" target="_blank" rel="noopener" class="contact-big-link" style="color:${c.text}">
+            <a href="${safeUrl(d.contact.github)}" target="_blank" rel="noopener" class="contact-big-link" style="color:${c.text}">
               <span class="contact-link-label" style="color:${c.sub}">GitHub</span>
               <span class="contact-link-value">GitHub ↗<span class="contact-accent-dot" style="color:${a}">.</span></span>
             </a>` : ''}
             ${d.contact.linkedin ? `
-            <a href="${esc(d.contact.linkedin)}" target="_blank" rel="noopener" class="contact-big-link" style="color:${c.text}">
+            <a href="${safeUrl(d.contact.linkedin)}" target="_blank" rel="noopener" class="contact-big-link" style="color:${c.text}">
               <span class="contact-link-label" style="color:${c.sub}">LinkedIn</span>
               <span class="contact-link-value">LinkedIn ↗<span class="contact-accent-dot" style="color:${a}">.</span></span>
             </a>` : ''}
@@ -195,7 +195,7 @@ export function generateCinematic(
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"${esc(data.name)}","jobTitle":"${esc(data.title)}","description":"${esc(data.bio)}"${data.contact.email ? `,"email":"${esc(data.contact.email)}"` : ''}${data.contact.github ? `,"sameAs":"${esc(data.contact.github)}"` : ''}}</script>
+${buildJsonLd(data)}
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -732,8 +732,8 @@ a { text-decoration: none; color: inherit; }
   <span class="nav-name">${esc(data.name)}</span>
   <div class="nav-links">
     ${data.contact.email ? `<a href="mailto:${esc(data.contact.email)}" class="nav-link">Email</a>` : ''}
-    ${data.contact.github ? `<a href="${esc(data.contact.github)}" target="_blank" rel="noopener" class="nav-link">GitHub</a>` : ''}
-    ${data.contact.linkedin ? `<a href="${esc(data.contact.linkedin)}" target="_blank" rel="noopener" class="nav-link">LinkedIn</a>` : ''}
+    ${data.contact.github ? `<a href="${safeUrl(data.contact.github)}" target="_blank" rel="noopener" class="nav-link">GitHub</a>` : ''}
+    ${data.contact.linkedin ? `<a href="${safeUrl(data.contact.linkedin)}" target="_blank" rel="noopener" class="nav-link">LinkedIn</a>` : ''}
   </div>
 </nav>
 

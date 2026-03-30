@@ -1,5 +1,5 @@
 import type { ResumeData, SectionId } from '@/lib/types'
-import { esc, avatarHtml } from './shared'
+import { esc, avatarHtml, buildJsonLd, safeUrl, safeColor } from './shared'
 
 export function generateDeveloper(
   data: ResumeData,
@@ -7,7 +7,7 @@ export function generateDeveloper(
   sectionOrder: SectionId[],
   hiddenSections: SectionId[]
 ): string {
-  const a = esc(accent)
+  const a = safeColor(accent)
 
   const visibleSections = sectionOrder.filter((id) => !hiddenSections.includes(id))
 
@@ -99,8 +99,8 @@ export function generateDeveloper(
               ${p.tags.map((t) => `<span class="proj-tag">${esc(t)}</span>`).join('')}
             </div>
             <div class="proj-links">
-              ${p.liveUrl ? `<a href="${esc(p.liveUrl)}" target="_blank" class="proj-link proj-link--live">Live ↗</a>` : ''}
-              ${p.repoUrl ? `<a href="${esc(p.repoUrl)}" target="_blank" class="proj-link proj-link--repo">Repo ↗</a>` : ''}
+              ${p.liveUrl ? `<a href="${safeUrl(p.liveUrl)}" target="_blank" class="proj-link proj-link--live">Live ↗</a>` : ''}
+              ${p.repoUrl ? `<a href="${safeUrl(p.repoUrl)}" target="_blank" class="proj-link proj-link--repo">Repo ↗</a>` : ''}
             </div>
           </div>`
           )
@@ -178,10 +178,10 @@ export function generateDeveloper(
       contactLinks.push(`<a href="mailto:${esc(data.contact.email)}" class="contact-link">${esc(data.contact.email)}</a>`)
     }
     if (data.contact.github) {
-      contactLinks.push(`<a href="${esc(data.contact.github)}" target="_blank" class="contact-link">GitHub ↗</a>`)
+      contactLinks.push(`<a href="${safeUrl(data.contact.github)}" target="_blank" class="contact-link">GitHub ↗</a>`)
     }
     if (data.contact.linkedin) {
-      contactLinks.push(`<a href="${esc(data.contact.linkedin)}" target="_blank" class="contact-link">LinkedIn ↗</a>`)
+      contactLinks.push(`<a href="${safeUrl(data.contact.linkedin)}" target="_blank" class="contact-link">LinkedIn ↗</a>`)
     }
 
     return lineWrap(lines) + (contactLinks.length ? `<div class="contact-actions">${contactLinks.join('')}</div>` : '')
@@ -263,7 +263,7 @@ export function generateDeveloper(
 <meta property="og:type" content="profile">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"${esc(data.name)}","jobTitle":"${esc(data.title)}","description":"${esc(data.bio)}"${data.contact.email ? ',"email":"' + esc(data.contact.email) + '"' : ''}${data.contact.github ? ',"sameAs":"' + esc(data.contact.github) + '"' : ''}}</script>
+${buildJsonLd(data)}
 <style>
 /* ── Reset & Base ──────────────────────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0}

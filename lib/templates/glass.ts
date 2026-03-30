@@ -1,5 +1,5 @@
 import type { ResumeData, SectionId } from '@/lib/types'
-import { esc, renderSections, avatarHtml } from './shared'
+import { esc, renderSections, avatarHtml, buildJsonLd, safeUrl, safeColor } from './shared'
 
 export function generateGlass(
   data: ResumeData,
@@ -7,7 +7,7 @@ export function generateGlass(
   sectionOrder: SectionId[],
   hiddenSections: SectionId[]
 ): string {
-  const a = esc(accent)
+  const a = safeColor(accent)
 
   // Derive initials for the avatar
   const nameParts = data.name.trim().split(/\s+/)
@@ -95,8 +95,8 @@ export function generateGlass(
                 ${p.tags.map((t) => `<span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:500;background:${a}18;color:${a};border:1px solid ${a}30">${esc(t)}</span>`).join('')}
               </div>` : ''}
               <div style="display:flex;gap:10px;margin-top:4px">
-                ${p.liveUrl ? `<a href="${esc(p.liveUrl)}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:9px 16px;background:${a};color:#ffffff;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;box-shadow:0 4px 16px ${a}40;transition:opacity 0.2s ease" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Live ↗</a>` : ''}
-                ${p.repoUrl ? `<a href="${esc(p.repoUrl)}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:9px 16px;background:rgba(255,255,255,0.08);color:#ffffff;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;border:1px solid rgba(255,255,255,0.15);transition:background 0.2s ease" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">Repo ↗</a>` : ''}
+                ${p.liveUrl ? `<a href="${safeUrl(p.liveUrl)}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:9px 16px;background:${a};color:#ffffff;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;box-shadow:0 4px 16px ${a}40;transition:opacity 0.2s ease" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Live ↗</a>` : ''}
+                ${p.repoUrl ? `<a href="${safeUrl(p.repoUrl)}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:9px 16px;background:rgba(255,255,255,0.08);color:#ffffff;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;border:1px solid rgba(255,255,255,0.15);transition:background 0.2s ease" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">Repo ↗</a>` : ''}
               </div>
             </div>`).join('')}
           </div>
@@ -159,8 +159,8 @@ export function generateGlass(
             <p style="font-size:36px;font-weight:800;color:#ffffff;margin-bottom:8px">${esc(d.name)}</p>
             ${d.contact.email ? `<a href="mailto:${esc(d.contact.email)}" style="font-size:20px;color:${a};text-decoration:none;display:block;margin-bottom:32px;font-weight:500">${esc(d.contact.email)}</a>` : ''}
             <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:12px">
-              ${d.contact.github ? `<a href="${esc(d.contact.github)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:rgba(255,255,255,0.08);color:#ffffff;border-radius:12px;text-decoration:none;font-size:14px;font-weight:600;border:1px solid rgba(255,255,255,0.15);transition:background 0.2s ease" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">GitHub ↗</a>` : ''}
-              ${d.contact.linkedin ? `<a href="${esc(d.contact.linkedin)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:${a};color:#ffffff;border-radius:12px;text-decoration:none;font-size:14px;font-weight:600;box-shadow:0 4px 20px ${a}50;transition:opacity 0.2s ease" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">LinkedIn ↗</a>` : ''}
+              ${d.contact.github ? `<a href="${safeUrl(d.contact.github)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:rgba(255,255,255,0.08);color:#ffffff;border-radius:12px;text-decoration:none;font-size:14px;font-weight:600;border:1px solid rgba(255,255,255,0.15);transition:background 0.2s ease" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">GitHub ↗</a>` : ''}
+              ${d.contact.linkedin ? `<a href="${safeUrl(d.contact.linkedin)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:${a};color:#ffffff;border-radius:12px;text-decoration:none;font-size:14px;font-weight:600;box-shadow:0 4px 20px ${a}50;transition:opacity 0.2s ease" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">LinkedIn ↗</a>` : ''}
             </div>
           </div>
         </div>
@@ -182,7 +182,7 @@ export function generateGlass(
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"${esc(data.name)}","jobTitle":"${esc(data.title)}","description":"${esc(data.bio)}"${data.contact.email ? `,"email":"${esc(data.contact.email)}"` : ''}${data.contact.github ? `,"sameAs":"${esc(data.contact.github)}"` : ''}}</script>
+${buildJsonLd(data)}
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -427,7 +427,7 @@ a { text-decoration: none; }
   <p class="hero-bio anim" style="animation-delay:0.3s">${esc(data.bio)}</p>
   <div class="hero-ctas anim" style="animation-delay:0.4s">
     ${data.contact.email ? `<a href="mailto:${esc(data.contact.email)}" class="cta-primary">Get In Touch</a>` : ''}
-    ${data.contact.github ? `<a href="${esc(data.contact.github)}" target="_blank" rel="noopener" class="cta-ghost">View GitHub ↗</a>` : ''}
+    ${data.contact.github ? `<a href="${safeUrl(data.contact.github)}" target="_blank" rel="noopener" class="cta-ghost">View GitHub ↗</a>` : ''}
   </div>
 </section>
 

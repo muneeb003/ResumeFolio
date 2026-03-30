@@ -1,5 +1,5 @@
 import type { ResumeData, SectionId } from '@/lib/types'
-import { esc, renderSections, tags, avatarHtml } from './shared'
+import { esc, renderSections, tags, avatarHtml, buildJsonLd, safeUrl, safeColor } from './shared'
 
 export function generateBold(
   data: ResumeData,
@@ -7,7 +7,7 @@ export function generateBold(
   sectionOrder: SectionId[],
   hiddenSections: SectionId[]
 ): string {
-  const a = esc(accentColor)
+  const a = safeColor(accentColor)
 
   const renderers = {
     experience: (d: ResumeData) => !d.experience.length ? '' : `
@@ -42,8 +42,8 @@ export function generateBold(
                 <p style="font-size:14px;color:#666;line-height:1.6;margin-bottom:12px">${esc(p.description)}</p>
                 <div style="margin-bottom:12px">${tags(p.tags, accentColor)}</div>
                 <div style="display:flex;gap:8px">
-                  ${p.liveUrl ? `<a href="${esc(p.liveUrl)}" target="_blank" style="font-size:12px;font-weight:600;color:#fff;background:${a};text-decoration:none;padding:5px 12px;border-radius:6px">Live Demo</a>` : ''}
-                  ${p.repoUrl ? `<a href="${esc(p.repoUrl)}" target="_blank" style="font-size:12px;font-weight:600;color:#555;background:#f5f5f5;text-decoration:none;padding:5px 12px;border-radius:6px">GitHub</a>` : ''}
+                  ${p.liveUrl ? `<a href="${safeUrl(p.liveUrl)}" target="_blank" style="font-size:12px;font-weight:600;color:#fff;background:${a};text-decoration:none;padding:5px 12px;border-radius:6px">Live Demo</a>` : ''}
+                  ${p.repoUrl ? `<a href="${safeUrl(p.repoUrl)}" target="_blank" style="font-size:12px;font-weight:600;color:#555;background:#f5f5f5;text-decoration:none;padding:5px 12px;border-radius:6px">GitHub</a>` : ''}
                 </div>
               </div>
             </div>
@@ -85,8 +85,8 @@ export function generateBold(
         <p style="font-size:14px;color:#666;margin-bottom:20px">Open to opportunities and collaborations</p>
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
           ${d.contact.email ? `<a href="mailto:${esc(d.contact.email)}" style="font-size:14px;font-weight:600;color:#fff;background:${a};text-decoration:none;padding:10px 20px;border-radius:10px">${esc(d.contact.email)}</a>` : ''}
-          ${d.contact.github ? `<a href="${esc(d.contact.github)}" target="_blank" style="font-size:14px;font-weight:600;color:#555;background:#ececec;text-decoration:none;padding:10px 20px;border-radius:10px">GitHub ↗</a>` : ''}
-          ${d.contact.linkedin ? `<a href="${esc(d.contact.linkedin)}" target="_blank" style="font-size:14px;font-weight:600;color:#555;background:#ececec;text-decoration:none;padding:10px 20px;border-radius:10px">LinkedIn ↗</a>` : ''}
+          ${d.contact.github ? `<a href="${safeUrl(d.contact.github)}" target="_blank" style="font-size:14px;font-weight:600;color:#555;background:#ececec;text-decoration:none;padding:10px 20px;border-radius:10px">GitHub ↗</a>` : ''}
+          ${d.contact.linkedin ? `<a href="${safeUrl(d.contact.linkedin)}" target="_blank" style="font-size:14px;font-weight:600;color:#555;background:#ececec;text-decoration:none;padding:10px 20px;border-radius:10px">LinkedIn ↗</a>` : ''}
         </div>
       </section>`,
   }
@@ -104,7 +104,7 @@ export function generateBold(
 <meta property="og:type" content="profile">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"${esc(data.name)}","jobTitle":"${esc(data.title)}"}</script>
+${buildJsonLd(data)}
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Plus Jakarta Sans',sans-serif;color:#111;background:#fff;line-height:1.6;-webkit-font-smoothing:antialiased}

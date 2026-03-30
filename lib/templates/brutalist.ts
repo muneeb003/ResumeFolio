@@ -1,5 +1,5 @@
 import type { ResumeData, SectionId } from '@/lib/types'
-import { esc, renderSections, avatarHtml } from './shared'
+import { esc, renderSections, avatarHtml, buildJsonLd, safeUrl, safeColor } from './shared'
 
 export function generateBrutalist(
   data: ResumeData,
@@ -7,7 +7,7 @@ export function generateBrutalist(
   sectionOrder: SectionId[],
   hiddenSections: SectionId[]
 ): string {
-  const a = esc(accent)
+  const a = safeColor(accent)
 
   // Square hard-border tag — accent bg, pure black text
   function bTag(text: string): string {
@@ -75,8 +75,8 @@ export function generateBrutalist(
       <p style="font-family:'Space Grotesk',sans-serif;font-size:15px;color:#1a1a1a;line-height:1.7;margin-bottom:16px;flex:1">${esc(p.description)}</p>
       ${p.tags.length ? `<div style="display:flex;flex-wrap:wrap;margin-bottom:20px">${p.tags.map((t) => bTag(t)).join('')}</div>` : ''}
       <div style="display:flex;gap:12px;flex-wrap:wrap">
-        ${p.liveUrl ? `<a href="${esc(p.liveUrl)}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#000;background:${a};text-decoration:none;padding:8px 14px;border:2px solid #000;display:inline-block;letter-spacing:0.05em">[LIVE ↗]</a>` : ''}
-        ${p.repoUrl ? `<a href="${esc(p.repoUrl)}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#fff;background:#000;text-decoration:none;padding:8px 14px;border:2px solid #000;display:inline-block;letter-spacing:0.05em">[CODE ↗]</a>` : ''}
+        ${p.liveUrl ? `<a href="${safeUrl(p.liveUrl)}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#000;background:${a};text-decoration:none;padding:8px 14px;border:2px solid #000;display:inline-block;letter-spacing:0.05em">[LIVE ↗]</a>` : ''}
+        ${p.repoUrl ? `<a href="${safeUrl(p.repoUrl)}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#fff;background:#000;text-decoration:none;padding:8px 14px;border:2px solid #000;display:inline-block;letter-spacing:0.05em">[CODE ↗]</a>` : ''}
       </div>
     </div>`
       )
@@ -130,8 +130,8 @@ export function generateBrutalist(
   <div style="font-family:'Space Grotesk',sans-serif;font-size:clamp(32px,6vw,64px);font-weight:800;color:#fff;line-height:1;margin-bottom:48px;letter-spacing:-0.02em">FOR WORK</div>
   <div style="display:flex;flex-direction:column;gap:12px;align-items:center;max-width:420px;margin:0 auto">
     ${d.contact.email ? `<a href="mailto:${esc(d.contact.email)}" style="display:block;width:100%;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#000;background:${a};text-decoration:none;padding:16px 28px;border:3px solid ${a};text-align:center;letter-spacing:0.05em">${esc(d.contact.email)}</a>` : ''}
-    ${d.contact.github ? `<a href="${esc(d.contact.github)}" target="_blank" rel="noopener" style="display:block;width:100%;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#fff;background:transparent;text-decoration:none;padding:16px 28px;border:3px solid #fff;text-align:center;letter-spacing:0.05em">GITHUB ↗</a>` : ''}
-    ${d.contact.linkedin ? `<a href="${esc(d.contact.linkedin)}" target="_blank" rel="noopener" style="display:block;width:100%;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#000;background:#fff;text-decoration:none;padding:16px 28px;border:3px solid #fff;text-align:center;letter-spacing:0.05em">LINKEDIN ↗</a>` : ''}
+    ${d.contact.github ? `<a href="${safeUrl(d.contact.github)}" target="_blank" rel="noopener" style="display:block;width:100%;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#fff;background:transparent;text-decoration:none;padding:16px 28px;border:3px solid #fff;text-align:center;letter-spacing:0.05em">GITHUB ↗</a>` : ''}
+    ${d.contact.linkedin ? `<a href="${safeUrl(d.contact.linkedin)}" target="_blank" rel="noopener" style="display:block;width:100%;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#000;background:#fff;text-decoration:none;padding:16px 28px;border:3px solid #fff;text-align:center;letter-spacing:0.05em">LINKEDIN ↗</a>` : ''}
   </div>
 </section>`,
   }
@@ -150,7 +150,7 @@ export function generateBrutalist(
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"${esc(data.name)}","jobTitle":"${esc(data.title)}"}</script>
+${buildJsonLd(data)}
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Space Grotesk',sans-serif;background:#f5f0e8;color:#1a1a1a;-webkit-font-smoothing:antialiased}
@@ -185,7 +185,7 @@ a{cursor:pointer}
   <p style="font-family:'Space Grotesk',sans-serif;font-size:18px;color:rgba(255,255,255,0.85);max-width:700px;line-height:1.7;margin-bottom:40px">${esc(data.bio)}</p>
   <div style="display:flex;gap:16px;flex-wrap:wrap">
     ${data.contact.email ? `<a href="mailto:${esc(data.contact.email)}" style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:${a};background:#000;text-decoration:none;padding:14px 28px;border:3px solid ${a};letter-spacing:0.05em;display:inline-block">CONTACT ME</a>` : ''}
-    ${data.contact.github ? `<a href="${esc(data.contact.github)}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#000;background:${a};text-decoration:none;padding:14px 28px;border:3px solid ${a};letter-spacing:0.05em;display:inline-block">VIEW GITHUB ↗</a>` : ''}
+    ${data.contact.github ? `<a href="${safeUrl(data.contact.github)}" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#000;background:${a};text-decoration:none;padding:14px 28px;border:3px solid ${a};letter-spacing:0.05em;display:inline-block">VIEW GITHUB ↗</a>` : ''}
   </div>
 </header>
 

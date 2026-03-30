@@ -23,6 +23,7 @@ ResumeFolio is a production-grade SaaS tool that handles the full pipeline: docu
 - **Three Auth Methods** — GitHub OAuth, Google OAuth, Email magic link (via Resend/SMTP) with automatic cross-provider account linking
 - **Rate Limiting** — Upstash Redis rate limiter on all AI and deploy endpoints
 - **ZIP Export** — Download a self-contained HTML file as a ZIP for self-hosting
+- **Output Security** — All generated HTML is hardened: user content HTML-escaped via OWASP-compliant `esc()`, URLs validated to `http(s)://` and `mailto:` only (`safeUrl()`), accent colors validated to hex only (`safeColor()`), JSON-LD structured data serialized with `JSON.stringify()` + `</script>` escape to prevent script tag breakout
 
 ---
 
@@ -330,10 +331,24 @@ npm run lint      # ESLint
 
 ---
 
-## Security Notes
+## Security
 
-- All AI and deploy routes are protected by session middleware and Upstash rate limiting
-- User content is HTML-escaped through a shared `esc()` utility before injection into templates (XSS prevention)
-- GitHub access tokens are stored in encrypted JWT sessions only — never written to the database
-- `allowDangerousEmailAccountLinking` is enabled on Google OAuth because Google verifies email ownership before issuing tokens
+### Output sanitization (generated HTML)
+
+The generated portfolio HTML files are user-controlled content served publicly. All injection vectors are addressed in `lib/templates/shared.ts`:
+
+| Risk | Function | What it does |
+|---|---|---|
+| XSS via text/attribute injection | `esc(str)` | Encodes `& < > " '` — applied to all user text fields |
+| `javascript:` / `data:` URL injection | `safeUrl(url)` | Allow-lists `https?://` and `mailto:` only; returns `#` otherwise |
+| CSS injection via accent color | `safeColor(color)` | Validates against `/^#[0-9a-fA-F]{3,8}$/`; falls back to `#4f46e5` |
+| JSON-LD script tag breakout | `buildJsonLd(data)` | Uses `JSON.stringify()` (not `esc()`); escapes `</script>` → `<\/script>` |
+
+### Application security
+
+- All AI and deploy API routes require a valid session (NextAuth middleware)
+- Upstash Redis rate limiting on all AI and deploy endpoints prevents abuse
+- GitHub OAuth access tokens stored in encrypted JWT session cookies only — never persisted to the database
+- Zod schema validation on all API request bodies
+- `allowDangerousEmailAccountLinking` on Google OAuth is safe because Google verifies email ownership before issuing tokens
 - `.env.local` is gitignored — never commit real credentials

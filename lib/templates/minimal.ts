@@ -1,5 +1,5 @@
 import type { ResumeData, SectionId } from '@/lib/types'
-import { esc, renderSections, tags, avatarHtml } from './shared'
+import { esc, renderSections, tags, avatarHtml, buildJsonLd, safeUrl, safeColor } from './shared'
 
 export function generateMinimal(
   data: ResumeData,
@@ -7,7 +7,7 @@ export function generateMinimal(
   sectionOrder: SectionId[],
   hiddenSections: SectionId[]
 ): string {
-  const a = esc(accentColor)
+  const a = safeColor(accentColor)
 
   const renderers = {
     experience: (d: ResumeData) => !d.experience.length ? '' : `
@@ -40,8 +40,8 @@ export function generateMinimal(
               <p style="font-size:14px;color:#6b7280;line-height:1.6;margin-bottom:12px">${esc(p.description)}</p>
               <div style="margin-bottom:12px">${tags(p.tags, accentColor)}</div>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
-                ${p.liveUrl ? `<a href="${esc(p.liveUrl)}" target="_blank" style="font-size:12px;font-weight:500;color:${a};text-decoration:none;border:1px solid ${a};padding:4px 10px;border-radius:6px">Live Demo ↗</a>` : ''}
-                ${p.repoUrl ? `<a href="${esc(p.repoUrl)}" target="_blank" style="font-size:12px;font-weight:500;color:#6b7280;text-decoration:none;border:1px solid #e5e7eb;padding:4px 10px;border-radius:6px">GitHub ↗</a>` : ''}
+                ${p.liveUrl ? `<a href="${safeUrl(p.liveUrl)}" target="_blank" style="font-size:12px;font-weight:500;color:${a};text-decoration:none;border:1px solid ${a};padding:4px 10px;border-radius:6px">Live Demo ↗</a>` : ''}
+                ${p.repoUrl ? `<a href="${safeUrl(p.repoUrl)}" target="_blank" style="font-size:12px;font-weight:500;color:#6b7280;text-decoration:none;border:1px solid #e5e7eb;padding:4px 10px;border-radius:6px">GitHub ↗</a>` : ''}
               </div>
             </div>
           `).join('')}
@@ -81,8 +81,8 @@ export function generateMinimal(
         <h2 style="font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:${a};margin-bottom:20px;padding-bottom:8px;border-bottom:2px solid ${a}">Contact</h2>
         <div style="display:flex;gap:16px;flex-wrap:wrap">
           ${d.contact.email ? `<a href="mailto:${esc(d.contact.email)}" style="font-size:14px;color:${a};text-decoration:none">${esc(d.contact.email)}</a>` : ''}
-          ${d.contact.github ? `<a href="${esc(d.contact.github)}" target="_blank" style="font-size:14px;color:${a};text-decoration:none">GitHub ↗</a>` : ''}
-          ${d.contact.linkedin ? `<a href="${esc(d.contact.linkedin)}" target="_blank" style="font-size:14px;color:${a};text-decoration:none">LinkedIn ↗</a>` : ''}
+          ${d.contact.github ? `<a href="${safeUrl(d.contact.github)}" target="_blank" style="font-size:14px;color:${a};text-decoration:none">GitHub ↗</a>` : ''}
+          ${d.contact.linkedin ? `<a href="${safeUrl(d.contact.linkedin)}" target="_blank" style="font-size:14px;color:${a};text-decoration:none">LinkedIn ↗</a>` : ''}
         </div>
       </section>`,
   }
@@ -101,7 +101,7 @@ export function generateMinimal(
 <meta property="og:type" content="profile">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"${esc(data.name)}","jobTitle":"${esc(data.title)}","description":"${esc(data.bio)}"${data.contact.email ? `,"email":"${esc(data.contact.email)}"` : ''}${data.contact.github ? `,"sameAs":"${esc(data.contact.github)}"` : ''}}</script>
+${buildJsonLd(data)}
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;color:#111827;background:#fff;line-height:1.6;-webkit-font-smoothing:antialiased}
