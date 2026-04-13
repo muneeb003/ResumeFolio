@@ -2,13 +2,13 @@ import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
 
 function makeRedis(): Redis | null {
-  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+  const url   = process.env.UPSTASH_REDIS_REST_URL   ?? ''
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? ''
+  // Skip if unset or still contains a placeholder value
+  if (!url.startsWith('https://') || !token || token.startsWith('your-')) {
     return null
   }
-  return new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  })
+  return new Redis({ url, token })
 }
 
 const redis = makeRedis()
