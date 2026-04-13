@@ -16,7 +16,9 @@
       "Read(//c/Users/dell/.claude/projects/d--Resume-Projects-Resume-to-Portfolio/memory 2>/dev/null && cat C:Usersdell.claudeprojectsd--Resume-Projects-Resume-to-PortfoliomemoryMEMORY.md 2>/dev/**)",
       "Read(//c/Users/dell/.claude/projects/d--Resume-Projects-Resume-to-Portfolio/memory/**)",
       "Bash(npm uninstall:*)",
-      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''deps:'''', list\\(d.get\\(''''dependencies'''',{}\\).keys\\(\\)\\)\\)\")"
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''deps:'''', list\\(d.get\\(''''dependencies'''',{}\\).keys\\(\\)\\)\\)\")",
+      "Bash(grep -n \"window.scroll\\\\|IntersectionObserver\" lib/templates/*.ts)",
+      "Bash(grep -rn \"window.addEventListener.*scroll\" lib/templates/*.ts)"
     ],
     "additionalDirectories": [
       "d:\\Resume Projects\\Resume to Portfolio\\app\\portfolio\\[id]",

@@ -10,7 +10,7 @@ export function esc(str: string): string {
     .replace(/'/g, '&#039;')
 }
 
-// ── URL allow-listing ────────────────────────────────────────────────────────
+// ── URL allow-listing (for href attributes) ──────────────────────────────────
 // Blocks javascript:, data:, vbscript:, and any other non-http(s)/mailto scheme.
 // Returns '#' for anything that doesn't match.
 export function safeUrl(url: string): string {
@@ -20,6 +20,17 @@ export function safeUrl(url: string): string {
     return esc(trimmed)
   }
   return '#'
+}
+
+// ── Image src allow-listing ──────────────────────────────────────────────────
+// Same as safeUrl but also permits data:image/ base64 URIs (safe for img src).
+// Still blocks data:text/html, data:application/*, javascript:, etc.
+export function safeImgSrc(url: string): string {
+  if (!url) return ''
+  const trimmed = url.trim()
+  if (/^https?:\/\//i.test(trimmed)) return esc(trimmed)
+  if (/^data:image\/(jpeg|png|gif|webp|avif|svg\+xml);base64,/i.test(trimmed)) return trimmed
+  return ''
 }
 
 // ── Hex color validation ─────────────────────────────────────────────────────
@@ -65,9 +76,8 @@ export function avatarHtml(
     .map((w) => (w[0] ?? '').toUpperCase())
     .join('')
   if (data.photo) {
-    // safeUrl blocks javascript: and data: in src
-    const src = safeUrl(data.photo)
-    return `<img src="${src}" alt="${esc(data.name)}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;${extraStyle}">`
+    const src = safeImgSrc(data.photo)
+    if (src) return `<img src="${src}" alt="${esc(data.name)}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;${extraStyle}">`
   }
   return `<div style="width:${size}px;height:${size}px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${Math.round(size * 0.38)}px;flex-shrink:0;${extraStyle}">${esc(initials)}</div>`
 }

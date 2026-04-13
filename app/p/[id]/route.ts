@@ -1,4 +1,4 @@
-import { getPortfolioPublic } from '@/lib/db/portfolios'
+import { getPortfolioPublic, incrementViewCount } from '@/lib/db/portfolios'
 import { generateHTML } from '@/lib/templates/index'
 
 export async function GET(
@@ -14,6 +14,9 @@ export async function GET(
       headers: { 'Content-Type': 'text/html' },
     })
   }
+
+  // Increment view count without blocking the response
+  incrementViewCount(id)
 
   const html = generateHTML(
     portfolio.resume_data,

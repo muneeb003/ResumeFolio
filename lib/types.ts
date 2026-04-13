@@ -67,6 +67,7 @@ export interface PortfolioRecord {
   github_repo: string | null
   deployment_url: string | null
   last_deployed_at: string | null
+  view_count: number
   created_at: string
   updated_at: string
 }

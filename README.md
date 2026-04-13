@@ -198,9 +198,13 @@ CREATE TABLE IF NOT EXISTS portfolios (
   github_repo      TEXT,
   deployment_url   TEXT,
   last_deployed_at TIMESTAMPTZ,
+  view_count       INTEGER NOT NULL DEFAULT 0,
   created_at       TIMESTAMPTZ DEFAULT NOW(),
   updated_at       TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- If you already created the portfolios table, run this migration:
+-- ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS view_count INTEGER NOT NULL DEFAULT 0;
 ```
 
 ### 7. Start the dev server

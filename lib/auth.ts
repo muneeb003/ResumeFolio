@@ -1,7 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import GitHubProvider from 'next-auth/providers/github'
 import GoogleProvider from 'next-auth/providers/google'
-import EmailProvider from 'next-auth/providers/email'
 import PostgresAdapter from '@auth/pg-adapter'
 import { Pool } from 'pg'
 
@@ -34,14 +33,6 @@ export const authOptions: NextAuthOptions = {
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             allowDangerousEmailAccountLinking: true,
-          }),
-        ]
-      : []),
-    ...(process.env.EMAIL_SERVER && process.env.EMAIL_FROM
-      ? [
-          EmailProvider({
-            server: process.env.EMAIL_SERVER,
-            from: process.env.EMAIL_FROM,
           }),
         ]
       : []),

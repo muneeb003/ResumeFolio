@@ -4,10 +4,14 @@ import { generateHTML } from '@/lib/templates/index'
 import { generateZip } from '@/lib/zip'
 import { deploySchema } from '@/lib/validation/deploySchema'
 import { withErrorHandler } from '@/lib/apiHelpers'
+import { deployLimiter, rateLimit } from '@/lib/ratelimit'
 
 export const POST = withErrorHandler(async (req: Request) => {
   const session = await getServerSession(authOptions)
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const limited = await rateLimit(deployLimiter, session.user?.email ?? 'anon')
+  if (limited) return limited
 
   const body = await req.json()
   const parsed = deploySchema.safeParse(body)

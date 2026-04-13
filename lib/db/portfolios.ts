@@ -100,3 +100,29 @@ export async function deletePortfolio(id: string, userId: string): Promise<void>
     WHERE id = ${id} AND user_id = ${userId}
   `
 }
+
+/** Fire-and-forget — call without await to avoid adding latency to page serves. */
+export async function incrementViewCount(id: string): Promise<void> {
+  try {
+    const sql = getDb()
+    await sql`
+      UPDATE portfolios SET view_count = view_count + 1
+      WHERE id = ${id}
+    `
+  } catch {
+    // Silently ignore — view counter failure must never break page serving
+  }
+}
+
+export async function duplicatePortfolio(id: string, userId: string): Promise<PortfolioRecord> {
+  const sql = getDb()
+  const rows = await sql`
+    INSERT INTO portfolios (user_id, name, resume_data, template_id, accent_color, section_order, hidden_sections)
+    SELECT user_id, name || ' (copy)', resume_data, template_id, accent_color, section_order, hidden_sections
+    FROM portfolios
+    WHERE id = ${id} AND user_id = ${userId}
+    RETURNING *
+  `
+  if (!rows[0]) throw new Error('Portfolio not found or access denied')
+  return rows[0] as unknown as PortfolioRecord
+}

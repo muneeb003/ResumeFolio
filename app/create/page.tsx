@@ -69,6 +69,18 @@ export default function UploadPage() {
   return (
     <main className="min-h-screen bg-zinc-50">
       <div className="max-w-lg mx-auto px-4 py-16">
+        <div className="flex items-center justify-between mb-6">
+          <a
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-700 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Dashboard
+          </a>
+        </div>
+
         <StepIndicator currentStep={1} />
 
         <div className="mb-8">

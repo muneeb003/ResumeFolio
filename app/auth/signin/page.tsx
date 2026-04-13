@@ -2,37 +2,18 @@
 
 import { signIn, useSession } from 'next-auth/react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect } from 'react'
 
 function SignInContent() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard'
   const { status } = useSession()
   const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [emailSent, setEmailSent] = useState(false)
-  const [emailLoading, setEmailLoading] = useState(false)
-  const [emailError, setEmailError] = useState('')
-
   useEffect(() => {
     if (status === 'authenticated') {
       router.replace(callbackUrl)
     }
   }, [status, callbackUrl, router])
-
-  async function handleEmailSignIn(e: React.FormEvent) {
-    e.preventDefault()
-    if (!email.trim()) return
-    setEmailLoading(true)
-    setEmailError('')
-    const res = await signIn('email', { email, callbackUrl, redirect: false })
-    setEmailLoading(false)
-    if (res?.error) {
-      setEmailError('Failed to send email. Please try again.')
-    } else {
-      setEmailSent(true)
-    }
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-50 px-4">
@@ -75,42 +56,6 @@ function SignInContent() {
             Continue with Google
           </button>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-1">
-            <div className="flex-1 h-px bg-zinc-100" />
-            <span className="text-[11px] text-zinc-400">or continue with email</span>
-            <div className="flex-1 h-px bg-zinc-100" />
-          </div>
-
-          {/* Email magic link */}
-          {emailSent ? (
-            <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4 text-center">
-              <p className="text-2xl mb-2">📬</p>
-              <p className="text-xs font-semibold text-indigo-800 mb-1">Check your inbox</p>
-              <p className="text-xs text-indigo-500 leading-relaxed">
-                We sent a sign-in link to <strong>{email}</strong>
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={handleEmailSignIn} className="flex flex-col gap-2.5">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 placeholder:text-zinc-400 transition-all"
-              />
-              {emailError && <p className="text-xs text-red-500">{emailError}</p>}
-              <button
-                type="submit"
-                disabled={emailLoading}
-                className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 active:scale-[0.98] text-white text-sm font-medium py-2.5 rounded-lg transition-all duration-150"
-              >
-                {emailLoading ? 'Sending…' : 'Send magic link →'}
-              </button>
-            </form>
-          )}
         </div>
 
         <p className="text-center text-[11px] text-zinc-400 mt-5 leading-relaxed px-4">

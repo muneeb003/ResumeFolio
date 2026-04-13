@@ -9,13 +9,6 @@ export function generateCorporate(
 ): string {
   const a = safeColor(accent)
 
-  const initials = data.name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0].toUpperCase())
-    .join('')
-
   const sectionLabels: Record<SectionId, string> = {
     experience: 'Experience',
     projects: 'Projects',
@@ -208,15 +201,19 @@ ${buildJsonLd(data)}
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;color:#334155;background:#f8fafc;line-height:1.6;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',sans-serif;color:#334155;background:#f8fafc;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;transition:opacity .15s}
 a:hover{opacity:.75}
-.corp-sidebar{position:fixed;top:0;left:0;width:280px;height:100vh;background:#f8fafc;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;overflow-y:auto;z-index:100}
-.corp-main{margin-left:280px;padding:48px 52px;min-height:100vh}
+.corp-sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:#f8fafc;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;overflow-y:auto;z-index:100}
+.corp-main{margin-left:260px;padding:48px 44px;min-height:100vh}
 .corp-nav-link:hover{background:#f1f5f9;color:#0f172a!important;border-left-color:${a}60!important}
 .corp-nav-link.active{color:#0f172a!important;font-weight:600!important;border-left-color:${a}!important;background:#fff}
 .corp-proj-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.1)!important}
-@media(max-width:768px){
+@media(max-width:1024px){
+  .corp-sidebar{width:220px}
+  .corp-main{margin-left:220px;padding:36px 28px}
+}
+@media(max-width:900px){
   .corp-sidebar{position:relative;width:100%;height:auto;border-right:none;border-bottom:1px solid #e2e8f0;flex-direction:row;align-items:center;flex-wrap:wrap;padding:16px;gap:12px}
   .corp-main{margin-left:0;padding:32px 20px}
   .corp-sidebar-profile{display:flex;align-items:center;gap:12px;padding:0}
@@ -225,13 +222,16 @@ a:hover{opacity:.75}
   .corp-nav-link{padding:6px 12px!important;border-left:none!important;border-radius:6px!important;border-bottom:2px solid transparent!important}
   .corp-nav-link.active{border-bottom-color:${a}!important;background:#f1f5f9}
 }
+@media(max-width:480px){
+  .corp-main{padding:20px 16px}
+}
 </style>
 </head>
 <body>
 
 <aside class="corp-sidebar">
-  <div class="corp-sidebar-profile" style="padding:32px 24px 24px">
-    ${avatarHtml(data, 72, 'background:' + a + ';color:#fff;margin-bottom:16px;')}
+  <div class="corp-sidebar-profile" style="padding:28px 20px 20px">
+    ${avatarHtml(data, 64, 'background:' + a + ';color:#fff;margin-bottom:14px;')}
     <h1 style="font-size:17px;font-weight:700;color:#0f172a;line-height:1.3;margin-bottom:4px">${esc(data.name)}</h1>
     <p style="font-size:12px;color:#64748b;font-weight:500;line-height:1.4">${esc(data.title)}</p>
   </div>

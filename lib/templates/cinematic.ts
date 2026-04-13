@@ -708,6 +708,15 @@ a { text-decoration: none; color: inherit; }
 
 .contact-accent-dot { }
 
+.cin-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none}
+.cin-hamburger span{display:block;width:20px;height:1.5px;background:rgba(255,255,255,.8);border-radius:2px;transition:all .25s}
+.cin-hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.cin-hamburger.open span:nth-child(2){opacity:0}
+.cin-hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+.cin-mobile-menu{display:none;flex-direction:column;position:fixed;top:52px;left:0;right:0;background:rgba(10,10,10,.97);border-bottom:1px solid rgba(255,255,255,.08);z-index:99;padding:8px 0}
+.cin-mobile-menu.open{display:flex}
+.cin-mobile-menu a{display:block;padding:12px 24px;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);text-decoration:none;letter-spacing:.05em;text-transform:uppercase;transition:color .15s}
+.cin-mobile-menu a:hover{color:#fff}
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .cin-hero { padding: 80px 24px 60px; }
@@ -715,6 +724,7 @@ a { text-decoration: none; color: inherit; }
   .section-num { right: 16px; font-size: 15vw; }
   #cin-nav { padding: 0 20px; }
   .nav-links { display: none; }
+  .cin-hamburger { display: flex; }
   .proj-card { min-width: 290px; max-width: 290px; height: 260px; }
   .hero-last { margin-left: 12px; }
   .timeline { padding-left: 28px; }
@@ -735,7 +745,15 @@ a { text-decoration: none; color: inherit; }
     ${data.contact.github ? `<a href="${safeUrl(data.contact.github)}" target="_blank" rel="noopener" class="nav-link">GitHub</a>` : ''}
     ${data.contact.linkedin ? `<a href="${safeUrl(data.contact.linkedin)}" target="_blank" rel="noopener" class="nav-link">LinkedIn</a>` : ''}
   </div>
+  <button class="cin-hamburger" id="cin-ham" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="cin-mobile-menu" id="cin-mob">
+  ${data.contact.email ? `<a href="mailto:${esc(data.contact.email)}">Email</a>` : ''}
+  ${data.contact.github ? `<a href="${safeUrl(data.contact.github)}" target="_blank" rel="noopener">GitHub</a>` : ''}
+  ${data.contact.linkedin ? `<a href="${safeUrl(data.contact.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : ''}
+</div>
 
 <section class="cin-hero" id="hero">
   <div class="hero-bg-grid" aria-hidden="true"></div>
@@ -771,7 +789,7 @@ ${sections}
     }, 200);
   });
 
-  // Show nav after hero
+  // Show nav after hero (also reveal immediately in iframe previews where window.scroll doesn't fire)
   window.addEventListener('scroll', function () {
     if (window.scrollY > heroH * 0.6) {
       nav.classList.add('visible');
@@ -779,6 +797,23 @@ ${sections}
       nav.classList.remove('visible');
     }
   }, { passive: true });
+  setTimeout(function() { nav.classList.add('visible'); }, 300);
+
+  // Hamburger toggle
+  var ham = document.getElementById('cin-ham');
+  var mob = document.getElementById('cin-mob');
+  if (ham && mob) {
+    ham.addEventListener('click', function() {
+      ham.classList.toggle('open');
+      mob.classList.toggle('open');
+    });
+    mob.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('click', function() {
+        ham.classList.remove('open');
+        mob.classList.remove('open');
+      });
+    });
+  }
 
   // Intersection Observer for reveal animations
   var revealItems = document.querySelectorAll('.reveal-item, .timeline-entry');

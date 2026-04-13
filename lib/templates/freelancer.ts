@@ -264,12 +264,24 @@ a:hover{opacity:.8}
 .fl-proj-item:hover{padding-left:12px!important}
 .fl-proj-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:${a};border-radius:2px;opacity:0;transition:opacity .2s}
 .fl-proj-item:hover::before{opacity:1}
+.fl-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none}
+.fl-hamburger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:all .25s}
+.fl-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.fl-hamburger.open span:nth-child(2){opacity:0}
+.fl-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.fl-mobile-menu{display:none;flex-direction:column;background:#111827;border-top:1px solid rgba(255,255,255,.1);padding:12px 0}
+.fl-mobile-menu.open{display:flex}
+.fl-mobile-menu a{display:block;padding:12px 24px;font-size:14px;font-weight:500;color:rgba(255,255,255,.8);text-decoration:none;transition:color .15s}
+.fl-mobile-menu a:hover{color:#fff}
 @media(max-width:768px){
   .fl-hero-split{flex-direction:column!important}
   .fl-hero-left{min-height:auto!important;padding:52px 28px!important}
   .fl-hero-right{min-height:300px!important}
   .fl-hero-name{font-size:clamp(36px,10vw,56px)!important}
-  .fl-sticky-nav{display:none}
+  .fl-sticky-nav{display:flex!important;flex-direction:column;padding:0!important}
+  .fl-sticky-nav > .fl-nav-inner{padding:16px 20px!important}
+  .fl-nav-links{display:none!important}
+  .fl-hamburger{display:flex!important}
 }
 @media(max-width:640px){
   section > div{padding:0 24px!important}
@@ -281,9 +293,17 @@ a:hover{opacity:.8}
 <body>
 
 <header style="position:relative">
-  <nav class="fl-sticky-nav" style="position:absolute;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:flex;align-items:center;justify-content:space-between">
-    <span style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;letter-spacing:-.01em">${esc(data.name.split(' ')[0] ?? data.name)}</span>
-    <div style="display:flex;gap:28px;align-items:center">
+  <nav class="fl-sticky-nav" style="position:absolute;top:0;left:0;right:0;z-index:100">
+    <div class="fl-nav-inner" style="padding:20px 48px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;letter-spacing:-.01em">${esc(data.name.split(' ')[0] ?? data.name)}</span>
+      <div class="fl-nav-links" style="display:flex;gap:28px;align-items:center">
+        ${navLinks}
+      </div>
+      <button class="fl-hamburger" id="fl-ham" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="fl-mobile-menu" id="fl-mob">
       ${navLinks}
     </div>
   </nav>
@@ -328,6 +348,20 @@ a:hover{opacity:.8}
 
 <script>
 (function() {
+  var ham = document.getElementById('fl-ham');
+  var mob = document.getElementById('fl-mob');
+  if (ham && mob) {
+    ham.addEventListener('click', function() {
+      ham.classList.toggle('open');
+      mob.classList.toggle('open');
+    });
+    mob.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('click', function() {
+        ham.classList.remove('open');
+        mob.classList.remove('open');
+      });
+    });
+  }
   var expCount = ${data.experience.length};
   for (var i = 0; i < expCount; i++) {
     (function(idx) {

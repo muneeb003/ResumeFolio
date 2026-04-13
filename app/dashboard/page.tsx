@@ -24,6 +24,10 @@ export default function DashboardPage() {
     setPortfolios((prev) => prev.filter((p) => p.id !== id))
   }
 
+  function handleDuplicate(copy: PortfolioRecord) {
+    setPortfolios((prev) => [copy, ...prev])
+  }
+
   function handleCreateNew() {
     clearAll()
   }
@@ -162,7 +166,7 @@ export default function DashboardPage() {
           ) : (
             <div className="flex flex-col gap-2">
               {portfolios.map((p) => (
-                <PortfolioCard key={p.id} portfolio={p} onDelete={handleDelete} />
+                <PortfolioCard key={p.id} portfolio={p} onDelete={handleDelete} onDuplicate={handleDuplicate} />
               ))}
 
               {/* Add new row */}
